@@ -1,0 +1,273 @@
+<head>
+    <!-- <link rel="shortcut icon" type="image/png" href='images/favicon.png'> -->
+    <title>Jake Gearhart</title>
+    <meta charset="utf-8">
+</head>
+<html>
+    <body onscroll='onScroll()'>  
+        <div id='menuBar'>
+            <button class='menuBarButton' onclick='window.scrollTo({top: 0, behavior: "smooth"});'>Home</button>
+            <button class='menuBarButton' onclick='document.getElementById("first-table").scrollIntoView({behavior: "smooth", block: "end"});'>Introduction</button>
+            <button class='menuBarButton' onclick='document.getElementById("pokegear-spacer").scrollIntoView({behavior: "smooth", block: "end"});'>Pokegear</button>
+            <button class='menuBarButton' onclick='document.getElementById("second-table").scrollIntoView({behavior: "smooth", block: "end"});'>Projects</button>
+            <button class='menuBarButton' onclick='document.getElementById("music-spacer").scrollIntoView({behavior: "smooth", block: "end"});'>Music</button>
+        </div>
+        <div id='background'>
+            <div id='title'>
+                <h1>Jake Gearhart</h1>
+            </div>
+            <table id='pokegear' class='invisible'>
+                <tr>
+                    <td style='padding: 0cm !important; padding-top: 2.15cm !important;'>
+                        <iframe src='https://pokegear.app'></iframe>
+                    </td>
+                    <td style='padding: 0cm !important; padding-top: 2.15cm !important;'>
+                        <div style='background-color: #f7f7f7; height: 100%; padding: 1cm;'>
+                            <h2>Pokegear.app</h2>
+                            <p>This is <a href='https://pokegear.app'>pokegear.app</a>, a comprehensive deck builder and viewer for the Pokémon Trading Card Game based on the <a href='https://pokemontcg.io'>pokemontcg.io</a> API.</p>
+                            <p>By opening the sidebar by hovering over the arrow, users are able to search for cards with the help of a variety of filters to add to the deck. Clicking on a card will bring up a variety of information about it such as the current market value of the card. Users can import and export decks using the top-right buttons as well as let a sorting algorithm automatically sort the deck.</p>
+                            <p>I began development in December of 2020 and published the first full release on March 1st of 2021. The program is now in use by a variety of the top players in the game.</p>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <table id='music' class='invisible'>
+                <tr>
+                    <td style='padding: 0cm !important; padding-top: 2.15cm !important;'>
+                        <div style='background-color: #f7f7f7; height: 100%; padding: 1cm; display: flex; flex-direction: column;'>
+                            <h2>Music Composition</h2>
+                            <p>Music composition has been an integral part of my life for the past four years. I have a background playing the violin since third grade, but I only learned about music composition and delved into it at the start of highschoool. After a journey of self-study over the course of three years and taking the short composition class my school offered, I was able to hone my abilities to the point where I was able to get accepted into <a href='https://www.colum.edu'>Columbia College</a> in Chicago to pursue a music composition major. Here are three examples of my work: "Spring Tides," and "A Short Piece for String Orchestra."</p>
+                            <div style='flex-grow: 1; background-image: url(portfolio/olumbia.png); background-repeat: no-repeat; background-position: center; background-size: contain; margin-bottom: 2cm'>
+                            </div>
+                        </div>
+                    </td>
+                    <td style='padding: 0cm !important; padding-top: 2.15cm !important;'>
+                        <video style='width: 100%; height: calc(50vh - 1cm); background-color: black;' controls>
+                            <source src='portfolio/spring_tides.mov'>
+                        </video>
+                        <video style='width: 100%; height: calc(50vh - 1cm); background-color: black;' controls>
+                            <source src='portfolio/strings.mov'>
+                        </video>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id='main'>
+            <div class='spacer' style='height: 50%;'></div>
+            <table id='first-table'>
+                <tr>
+                    <td style='background-color: white;'>
+                        <div style='height: calc(100vh - 4cm); display: flex; flex-direction: column;'>
+                            <h2>Who am I?</h2>
+                            <div style='flex-grow: 1; overflow: scroll;'>
+                                <h3>I Am A Programmer</h3>
+                                <p>My first introduction into programming was a project I undertook in eighth grade to create a small puzzle-based video game in C#. After enjoying that process thouroughly, I spent the next year working on smaller projects to develop my skills in other languages– JavaScript and Python. During the summer following tenth and eleventh grade, I interned at a company ITM21st. My role both years was to develop web-crawlers to extract data from sites that the company was interested in. During twelfth grade, I have put most of my time programming into a passion project: <a href='https://pokegear.app'>Pokegear.app</a> which I elaborate on in a dedicated section. To demonstrate my abilites and have the most creative freedom possible, I developed this site from scratch without using any frameworks or existing tools.</p>
+                                <h3>I Am A Composer</h3>
+                                <p>Stemming from my passion for programming comes my passion for classical composition. While playing and learning from 80s and 90s video games to build my own games, I came to the realization that I would need music for any game I would develop. As I elaborate on in the dedicated music section, I used my prior knowledge of classical music from playing the violin to ease myself into the process of composing music. Now, only a few years later, I plan to pursue composition as a career.</p>
+                                <h3>I Am A Competative Pokémon TCG Player</h3>
+                                <p>I have been playing the game since late 2013 and have become a regional champion, world championship's competitor, and top player in the online competative scene. As I elaborate on in my speech, Online Communities, and in the discussion of my leadership style, this game has allowed me to grow as a person and as a community member more than anything else in my life has.<p></p>
+                            </div>
+                        </div>
+                    </td>
+                    <td style='background-color: #f0f0f0;'>
+                        <div style='height: calc(100vh - 4cm); display: flex; flex-direction: column;'>
+                            <h2>My Leadership Style</h2>
+                            <div style='flex-grow: 1; overflow: scroll;'>
+                                <p>I am a democratic leader. I believe the best way to accomplish something as a group is to ensure that each individual’s capabilities are used to the fullest extent– and that includes the leadership abilities of individuals– while also ensuring all individuals are organized towards the common goal.</p>
+                                <p>While I believe Democratic leadership to be the most effective, it is not the only common leadership style. The two that straddle democratic leadership are autocratic and laissez faire leadership. Autocratic leadership or authoritarian leadership, according to Oxford-Review, “refers to any situation where a leader keeps hold of as much power as possible.“ This means autocratic leaders often, “make the decisions about policies, procedures, tasks, structures, rewards, and punishment themselves.” This method is a brute-force approach to group efforts. The benefit is that it guarantees an end product through rigid structure. However, because individuals have no say on the decisions being made by the leader, the individuals are unlikely to work optimally given the tasks they are delegated.</p>
+                                <p>Laissez faire leaders, according to Western Governors University, “don’t micromanage or get too involved, [and] don’t give too much instruction or guidance. Instead laissez-faire leaders let their employees use their creativity, resources, and experience to help them meet their goals.” However, this hands-off approach sacrifices group cohesion which results in an incohesive end result. I believe democratic leadership takes the positive aspects of both autocratic and laissez faire leadership and combines them while sacrificing little. The sacrifice democratic leadership does make is that it can often be characterized as slow. I believe that, when run well, the time gained by increased efficiency and the quality of the end product can outweigh the extra time spent.</p>
+                                <p>Unlike the first three primary leadership styles, the other two– transactional and transformational– can be integrated within another existing leadership style. This is because they are mostly focused on motivation rather than structure. According to Florida tech, “Transactional leadership is primarily based on processes and control, and requires a strict management structure. Transformational leadership, on the other hand, focuses on inspiring others to follow, and it requires a high degree of coordination, communication and cooperation.” I believe neither is strictly superior or inferior than the other because they are primarily situationally dependent. Not all causes are strong enough to work transformationally, and not all causes are fit for transactions– for example, non-profits.</p>
+                                <p>My experience participating in online communities over the past year has taught me a lot about the dynamics of leadership from the perspective of both a leader and a follower. Unfortunately some of the most critical moments I’ve experienced in the past year where leadership has been required in the online Pokémon card game competitive scene when a cheater is discovered. When I have not been in the position of a leader, it is easy to watch others crumble under the pressure to act. ‘Cancel culture’ has given more power to the public than ever and the leader often failed to adequately handlee public outcry. Although this social structure has an aspect of democracy, I would characterize it as more anarchical. The loudest opinions survive over the most logically sound. Many individuals follow people they look up to without questioning the issue themselves, and these faction leaders aren’t often making decisions based on all the facts and evidence simply because they do not have access to them. This highlights the importance of a strong leader in any democracy. A democratic leader’s role is not to make decisions on their own, but to ensure a stable on-topic platform does not crumble. I believe a democratic leader must make all evidence available to their peers in a concise and open manner, and make a decision based on public consensus only after everyone’s opinion has been heard.</p>
+                                <p>When presented with a new leadership opportunity, I try to establish a forum of open communication between members as soon as possible. If I’m an appointed leader, I try to make sure to entertain new ideas and not fall back on whatever qualifications I was appointed from to shut down opinions I disagree with. If I disagree with the consensus, I try to promote my argument to the best of my abilities, however if my ideas are not accepted, I try never to abuse my power and overturn the majority. When a decision is ready to be made, as the leader, I present the idea of voting to the group if a consensus has not already been reached.</p>
+                                <p class='source'>The Difference Between Transactional and Transformational Leadership. (n.d.). Florida Tech Online. <a href='https://www.floridatechonline.com/blog/psychology/the-difference-between-transactional-and-transformational-leadership/'>https://www.floridatechonline.com/blog/psychology/the-difference-between-transactional-and-transformational-leadership/</a></p>
+                                <p class='source'>Oxcognita LLC - Oxford Review Enterprises Ltd. (2020, April 23). Authoritarian leadership: Definition and explanation. The Oxford Review. <a href='https://www.oxford-review.com/oxford-review-encyclopaedia-terms/authoritarian-leadership/'>https://www.oxford-review.com/oxford-review-encyclopaedia-terms/authoritarian-leadership/</a></p>
+                                <p class='source'>Western Governors University. (2020, July 7). What Is Laissez-Faire Leadership? <a href='https://www.wgu.edu/blog/what-laissez-faire-leadership2006.html'>https://www.wgu.edu/blog/what-laissez-faire-leadership2006.html</a></p>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div id='pokegear-spacer' class='spacer' style='height: calc(100% - 2cm);'></div>
+            <table id='second-table'>
+                <tr>
+                    <td style='background-color: white;'>
+                        <div style='height: calc(100vh - 4cm); display: flex; flex-direction: column;'>
+                            <h2>Online Communities</h2>
+                            <h3>Speech given 03/04/2021</h3>
+                            <video width='100%' controls>
+                                <source src='portfolio/senior_speech.mov'>
+                            </video>
+                            <h2 style='font-size: large;'>Reflection & Transcript</h2>
+                            <div style='flex-grow: 1; overflow: scroll;'>
+                                <h3>Reflection</h3>
+                                <p>In writing this speech, I aimed to HERE</p>
+                                <h3>Transcript</h3>
+                                <p>We live in an unprecedented time. Not only have social media and internet forums brought us together more than ever, but at the same time, a global virus also seeks to tear us apart. Our sense of community and friendship is rapidly evolving and there is a unique opportunity to stay on top of and embrace it before things eventually return to whatever normal may be. Today, I hope to convince you to reach out with your passions, join and improve an online community, and make a lasting impact on the people you meet there. To do so, I'm going to share my experiences this past year, answer some questions you might have about online communities, and encourage you to follow in my footsteps.</p>
+                                <p>I am a competitive Pokémon card game player. I'm a regional champion and world championship's competitor. Many of you probably know about the Pokémon card game and were reminded of its existence in these few past months due to the recent craze and attention it's been given across social media. But you probably hadn't considered the possibility of there being a flourishing competitive scene that attracts tens of thousands of people to compete in tournaments all around the world every year. When COVID hit, predictably, a thousand people packed in a convention center all sitting only a couple feet away from each other playing a card game was not exactly feasible anymore. But that didn't prevent the game from growing. Instead, a revolution of sorts took place.</p>
+                                <p>I came back to the game in late June to discover a flourishing, albeit disorganized, online community. Many weekly online tournaments had begun to establish themselves and great players began to take to avenues like YouTube and Twitch to create their own smaller communities. After getting reacquainted with the game, I began to participate in some of these online tournaments. By the start of the school year, the scene had evolved to the point where actual prizing was available through sponsors from card shops. At this point I was able to reestablish myself as a top player by winning two one-hundred-person tournaments as well as achieving a top four in one with a thousand dollar prize pool.</p>
+                                <p>Immediately I was fully integrated into a rapidly-growing community of players, both old and new, all eager to learn more about the game and take advice from me and other players seeing success in the online scene. I began to come in contact with people all across the world, from the US, Canada, UK, Sweden, Singapore, Japan, Taiwan, and more. Building these global friendships has been instrumental in my life for the past six months and I'm surprised how much I was lacking before them. Despite our cultural differences and language barriers at times, we all have a congruent passion for the same game which allows us to speak that language together.</p>
+                                <p>Although you likely haven't had a long history with the Pokémon card game, you've probably had a few interests in the past that you haven't pursued into the online world yet. Chances are that one of those hobbies has seen a similar explosion online in the past year. Take the recent craze of the subreddit r/WallStreetBets. You've probably heard of the now legendary stock market fiasco that took place earlier this year. An online community of amateur investors were able to take down the morally questionable practices of hedge funds by beating them at their own game.</p>
+                                <b>Now that you know some examples of online communities, why should you join one?</b>
+                                <p>Every community can only accomplish as much as its members put in to it, and every community is just a collection of individuals. Without the passion of individuals, progress cannot be made. You should seek out and join an online community to help a collective for those reasons, but not only those. An online community does more than just act towards collective goals. They can enrich your life by creating friendships that otherwise would never be possible. I've met many people through the Pokémon community that I would've never met otherwise simply due to geography. In-person, we're restricted to making connections with people close to us geographically, which also means we are restricted culturally. The benefits of a friendship between two people with comparatively identical backgrounds are far fewer than a cross cultural friendship. Making connections often happens because people have similar interests. Why not take advantage of having similar interests to learn more about things you haven't already experienced?</p>
+                                <p>Another benefit of joining an online community is support from both individuals, and larger communities. If you're facing any challenges or hardships, you'll be able to find people experiencing the same thing and connect with those people. These support groups are online communities just like WallStreetBets, but as a whole, they have the power to help individuals rather than to stand out. As a Mayo Clinic article on online support groups points out, the benefits of online support groups include: "frequent and flexible participation, opportunities for people who may not have local face-to-face support groups, and a degree of privacy and anonymity." Although not a substitute for therapy and in-person support groups, an online support group is a much more diverse tool to be used on your time, as anonymously as you'd like. If you've participated in any of these in-person pursuits but have been hesitant to try anything online, given the current state of the world, this is the perfect time to do so as you'll encounter many others in your exact situation.</p>
+                                <b>After you've joined a community, what can you get out of it?</b>
+                                <p>Back in late September, an opportunity opened up to write an article on a recent innovation I spearheaded in the competitive Pokémon scene. I had never considered doing any public writing before, but I decided to take the opportunity to follow in the footsteps of people I had looked up to in the past. I could never have imagined the fun of writing to an audience of friends on a passion compared to the monotonous or formulaic writing that often plagues schoolwork. I certainly didn't expect to be writing a six thousand word article (four times the length of what I was expected from me) for people I hardly knew of six months prior, but the experience was fantastic. More recently, I've used my programming knowledge to build a new tool for players to view and build decks in the easiest way possible online. My webapp has already been featured in a few videos from prominent creators and I've made even more connections through listening to suggestions and fixing bugs people have reached out to me with.</p>
+                                <p>These were a couple ways I gave back to my community and learned more about a completely new area in the process. When you join a community, you won't get much out of it unless you put effort in. It takes time to build a reputation. Bringing in your unique perspective in whichever way you can is a great way to do so. Imagine yourself a few months from now in the position you would like to be in after joining a community. What steps did you take to build whatever reputation you wanted to end up with? You don't need to be formulaic about what you want to accomplish, but a plan is a great way to make sure you stay on track and use your time effectively.</p>
+                                <p>Now that you've heard my experience, I hope you'll be interested enough to pursue one of your hobbies online. Making new online friends can be difficult. In some ways is easier, but in others it's much harder. Don't be discouraged and fall behind on the times. Our methods of communication are changing and change is difficult but just a simple google search is enough to lead you on the right direction: to common places such as reddit or discord where small and large communities come together. If you have such a unique passion that there aren't outlets with people like you, don't be discouraged. Everything starts with one person. Share your ideas, and make your mark on the internet! Thank you.</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td style='background-color: #f0f0f0;'>
+                        <div style='height: calc(100vh - 4cm); display: flex; flex-direction: column;'>
+                            <h2>Senior Project Proposal</h2>
+                            <h3>05/24/2021 - 06/02/2021</h3>
+                            <video width='100%' controls>
+                                <source src='portfolio/senior_project.mov'>
+                            </video>
+                            <div style='flex-grow: 1; overflow: scroll;'>
+                                <p>REFLECTION</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td style='background-color: white;'>
+                        <h2>This I Believe Advocacy</h2>
+                    </td>
+                </tr>
+            </table>
+            <div id='music-spacer' class='spacer' style='height: 100%;'></div>
+        </div>
+    </body>
+</html>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        background-color: rgb(207, 239, 255);
+    }
+    h3 {
+        font-style: italic;
+        color: gray;
+        font-weight: lighter;
+    }
+    iframe {
+        border: none;
+        width: 100%;
+        height: 100%;
+    }
+    p {
+        font-size: larger;
+        text-indent: 2em;
+    }
+    p.source {
+        font-style: italic;
+        font-size: small;
+    }
+    b {
+        font-size: larger;
+    }
+    table {
+        width: 100%;
+        height: calc(100% - 2cm);
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+    td {
+        vertical-align: top;
+        padding: 1cm;;
+    }
+
+    .invisible {
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    #menuBar {
+        z-index: 2;
+        position: fixed;
+        height: 2cm;
+        width: 100%;
+        background-color: rgba(15, 15, 71, 0.7);
+        border-top: 0.1em solid rgba(15, 15, 71, 0.7);
+        border-bottom: 0.1em solid rgba(15, 15, 71, 0.7);
+        font-size: 1cm;
+    }
+    .menuBarButton {
+        display: inline-block;
+        height: 100%;
+        width: 15%;
+        border-top: none;
+        border-bottom: none;
+        border-left: none;
+        border-right: 0.1em solid rgba(15, 15, 71, 0.7);
+        background-color: initial;
+        font-size: inherit;
+        color: white;
+        transition: background-color 0.0625s, transform 0.0625s;
+    }
+    .menuBarButton:hover {
+        background-color: rgba(15, 15, 71, 0.7);
+        transform: scale(1.05);
+    }
+    .menuBarButton:active {
+        transform: scale(1.1);
+    }
+
+    #background {
+        z-index: 0;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
+    #background > * {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    #title {
+        display: flex;
+        padding-top: 1cm;
+        justify-content: center;
+        align-items: center;
+        height: 50%;
+        color: rgb(15, 15, 71);
+        font-size: 1.5cm;
+    }
+
+    #main {
+        position: relative;
+        z-index: 1;
+        pointer-events: none;
+    }
+    #main > *:not(.spacer) {
+        pointer-events: all;
+    }
+</style>
+<script>
+    const background = document.getElementById('background')
+    const spacers = document.getElementsByClassName('spacer')
+    var currentSpacer = null
+
+    function onScroll () {
+        for (i=0; i<spacers.length; i++) {
+            if(spacers[i] != currentSpacer && isElemInView(spacers[i])) {
+                currentSpacer = spacers[i]
+                for (j=0; j<background.children.length; j++) {
+                    background.children[j].classList.add('invisible')
+                }
+                background.children[i].classList.remove('invisible')
+            }
+        }
+    }
+
+    function isElemInView (elem) {
+        var rect = elem.getBoundingClientRect();
+        var windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+        if ((rect.top <= windowHeight) && ((rect.top + rect.height) >= 0)) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+</script>
