@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html>
     <body>
+        <p>Ultimately, I'm trying to figure out how to calculate M given the dimensions of the dotted rectangle W and H</p>
         <div id="screen-height-slider">W = 512px</div>
         <input type="range" min="0" max="2048" value="512" oninput="updateScreenHeight(this)" style="width: 100%">
         <div id="matrix-slider-value">M = -0.005</div>
         <input type="range" min="0" max="1000" value="500" oninput="updateMatrix(this)" style="width: 100%">
         <div id="plane-height-value"></div>
-        <div id="plane-height-percentage"></div>
-        <div id="pair"></div>
-        <div id="pair2"></div>
         <div id="outer-perspective-container">
             <div id="plane-height-marker"></div>
-            <div id="inner-perspective-container"></div>
+            <div id="inner-perspective-container">
+                <p>transform-origin: center bottom;</p>
+                <p>transform: matrix3d(1, 0, 0, 0, 0, 1, 0, var(--matrix-value), 0, 0, 1, 0, 0, 0, 0, 1);</p>
+            </div>
         </div>
     </body>
 </html>
@@ -81,35 +82,10 @@
         updatePlaneHeight()
     }
 
-    let pointList = []
-    let Xs = []
-    let Ys = []
     function updatePlaneHeight() {
         const height = document.getElementById('inner-perspective-container').getBoundingClientRect().height
         document.getElementById('plane-height-value').innerHTML = `H = ${height}px`
-        document.getElementById('plane-height-percentage').innerHTML = `H / W = ${height / screen_height}`
         css.setProperty('--plane-height', `${height}px`);
-
-        // pointList.push(`(${matrix}, ${height})`)
-        // Xs.push(height)
-        // Ys.push(matrix)
-        // document.getElementById('pair').innerHTML = `[${pointList.join(',')}]`
-        // document.getElementById('pair').innerHTML = Xs.join(',')
-        // document.getElementById('pair2').innerHTML = Ys.join(',')
     }
     updatePlaneHeight()
-
-    // document.addEventListener('keydown', (event) => {
-    //     if (event.key == 'r') {
-    //         pointList = []
-    //         Xs = []
-    //         Ys = []
-    //         const height = document.getElementById('inner-perspective-container').getBoundingClientRect().height
-    //         // pointList.push(`(-${matrix}, ${height})`)
-    //         // document.getElementById('pair').innerHTML = `[${pointList.join(',')}]`
-
-    //         document.getElementById('pair').innerHTML = Xs.join(',')
-    //         document.getElementById('pair2').innerHTML = Ys.join(',')
-    //     }
-    // })
 </script>
