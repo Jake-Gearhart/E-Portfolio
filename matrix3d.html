@@ -73,11 +73,11 @@
         updatePlaneHeight()
     }
 
-    let matrix = 0.005
+    let matrix = -0.005
     function updateMatrix(slider) {
-        matrix = slider.value/100000
-        css.setProperty('--matrix-value', `-${matrix}`);
-        document.getElementById('matrix-slider-value').innerHTML = `M = -${matrix}`
+        matrix = -slider.value/100000
+        css.setProperty('--matrix-value', `${matrix}`);
+        document.getElementById('matrix-slider-value').innerHTML = `M = ${matrix}`
 
         updatePlaneHeight()
     }
