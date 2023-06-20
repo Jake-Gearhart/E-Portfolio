@@ -1,173 +1,129 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <!-- <div style="display: flex;">Top Padding____________: <input id="padding-top-slider" type="range" min="0" max="500" value="100" oninput="updatePaddingTop()" style="flex-grow: 1;"></div>
-        <div style="display: flex;">Bottom Padding_________: <input id="padding-bottom-slider" type="range" min="0" max="500" value="200" oninput="updatePaddingBottom()" style="flex-grow: 1;"></div>
-        <div style="display: flex;">Maximum Board Steepness: <input id="max-board-width-slider" type="range" min="1000" max="3000" value="1000" oninput="updateBoardDistance()" style="flex-grow: 1;"></div> -->
         <div id="background"></div>
         <div style="display: flex;">
-            Enable Guides:
-            <input id="guides" type="checkbox" oninput="updateGuides()"> 
-            <span id="top-padding">Top Padding: XX.X%</span> 
-            <input id="padding-top-slider" type="range" min="0" max="500" value="50" oninput="updatePaddingTop()" style="flex-grow: 1;"> 
-            <span id="bottom-padding">Bottom Padding: XX.X%</span> 
-            <input id="padding-bottom-slider" type="range" min="0" max="500" value="150" oninput="updatePaddingBottom()" style="flex-grow: 1;"> 
-            <span id="max-board-width">Maximum Board Steepness: X.XXvh</span> 
-            <input id="max-board-width-slider" type="range" min="0" max="200" value="110" oninput="updateBoardDistance()" style="flex-grow: 1;">
+            Darken Background:
+            <input id="debug-background" type="checkbox" oninput="updateDebugBackground()"> 
         </div>
-        <div id="top-padding-indicator"></div>
-        <div id="bottom-padding-indicator"></div>
-        <div id="board-container">
-            <div id="board">
-                <img src="https://images.pokemontcg.io/swsh11/79_hires.png" style="position: absolute; width: 12.5%; top: 5%; left: 14%; transform: rotate(180deg)">
-                <img src="https://images.pokemontcg.io/swsh11/70_hires.png" style="position: absolute; width: 12.5%; left: 43.75%; top: 29%; transform: rotate(180deg)">
-                <img src="holofoil.gif" style="position: absolute; width: 12.5%; left: 43.75%; top: 29%; transform: rotate(180deg); pointer-events: none; mix-blend-mode: color-dodge">
-                <img src="https://images.pokemontcg.io/swsh6/61_hires.png" style="position: absolute; width: 12.5%; left: 43.75%; bottom: 29%;">
-                <img src="https://images.pokemontcg.io/sv1/86_hires.png" style="position: absolute; width: 12.5%; bottom: 5%; left: 18%">
-                <img src="holofoil.gif" style="position: absolute; width: 12.5%; bottom: 5%; left: 18%; pointer-events: none; mix-blend-mode: color-dodge;">
-                <img src="https://images.pokemontcg.io/swsh12/68_hires.png" style="position: absolute; width: 12.5%; bottom: 5%; left: 31.7%">
-            </div>
+        <div id="board" onclick="removeZoom()"></div>
+        <div class="board-transform"><img src="https://images.pokemontcg.io/swsh11/79_hires.png" style="position: absolute; width: 12.5%; bottom: 77.5%; left: 14%; transform: rotate(180deg)" onclick="zoom(this)"></div>
+        <div class="board-transform">
+            <img src="https://images.pokemontcg.io/swsh11/70_hires.png" style="position: absolute; width: 12.5%; left: 43.75%; bottom: 53.5%; transform: rotate(180deg)" onclick="zoom(this)">
+            <img src="holofoil.gif" style="position: absolute; width: 12.5%; left: 43.75%; bottom: 53.5%; transform: rotate(180deg); pointer-events: none; mix-blend-mode: color-dodge">
         </div>
+        <div class="board-transform"><img src="https://images.pokemontcg.io/swsh6/61_hires.png" style="position: absolute; width: 12.5%; left: 43.75%; bottom: 29%;" onclick="zoom(this)"></div>
+        <div class="board-transform">
+            <img src="https://images.pokemontcg.io/sv1/86_hires.png" style="position: absolute; width: 12.5%; bottom: 5%; left: 18%" onclick="zoom(this)">
+            <img src="holofoil.gif" style="position: absolute; width: 12.5%; bottom: 5%; left: 18%; pointer-events: none; mix-blend-mode: color-dodge;">
+        </div>
+        <div class="board-transform"><img src="https://images.pokemontcg.io/swsh12/68_hires.png" style="position: absolute; width: 12.5%; bottom: 5%; left: 31.7%" onclick="zoom(this)"></div>
     </body>
 </html>
 <style>
     :root {
-        --board-depth-transform: 0;
-        --board-vertical-transform: 0;
-        --board-padding-top: 0;
-        --board-padding-bottom: 0;
-        --max-board-width: 0;
-        --guides: none;
+        --debug-background: none;
     }
 
     body {
-        background-color: #1B7F65;
+        background-color: #1b7f64;
         color: white;
         font-family: monospace;
     }
 
     #background {
         position: absolute;
-        display: var(--guides);
+        display: var(--debug-background);
         width: 100%;
         height: 100%;
         left: 0;
         top: 0;
         background-color: #166953;
-        z-index: -2;
-    }
-
-    #top-padding-indicator {
-        position: absolute;
-        display: var(--guides);
-        width: 100%;
-        height: var(--board-padding-top);
-        top: 0;
-        left: 0;
-        border-bottom: 1px white dashed;
-        pointer-events: none;
-    }
-
-    #bottom-padding-indicator {
-        position: absolute;
-        display: var(--guides);
-        width: 100%;
-        height: var(--board-padding-bottom);
-        bottom: 0;
-        left: 0;
-        border-top: 1px white dashed;
-        pointer-events: none;
-    }
-
-    #board-container {
-        position: absolute;
-        /* width: calc(100vw - var(--max-board-width)); */
-        width: min(100vw, var(--max-board-width));
-        height: calc(100vh - var(--board-padding-top) - var(--board-padding-bottom));
-        top: var(--board-padding-top);
-        left: calc((100vw - min(100vw, var(--max-board-width))) / 2);
         z-index: -1;
         pointer-events: none;
-        /* background-color: black; */
     }
 
     #board {
-        position: absolute;
-        width: min(100vw, var(--max-board-width)); /*  width and height must be equal to parent's width */
-        height: min(100vw, var(--max-board-width));
-        left: 0;
-        bottom: 0;
-        transform-origin: center bottom;
-        transform: matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,var(--board-vertical-transform),0,1);
         background-image: url('board.png');
         background-repeat: no-repeat;
         background-size: 100% 100%;
-        pointer-events: all;
+        pointer-events: all !important;
     }
 
-    img:hover {
-        filter: invert();
+    .board-transform, #board {
+        position: absolute;
+        width: var(--board-side-length);
+        height: var(--board-side-length);
+        left: 0;
+        bottom: 0;
+        transform-origin: center bottom;
+        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,0,0,1);
+        pointer-events: none;
+        z-index: 0;
+        transition: all 0.4s;
+    }
+    .board-transform * {
+        pointer-events: all;
+        transition: all 0.4s;
+    }
+
+    .board-transform.zoom {
+        transform: translateX(var(--board-translateX)) translateY(0);
+        /* background-color: rgba(255,0,0,0.5); */
+        z-index: 1000;
+        /* pointer-events: all; */
+    }
+    .board-transform.zoom * {
+        width: 40% !important;
+        bottom: 20% !important;
+        left: 0% !important;
+        transform: rotate(0) !important;
+    }
+
+    img {
+        filter: drop-shadow(0 0 min(0.5vw, 0.5vh) rgba(0,0,0,0.5))
+    }
+    .board-transform.zoom img {
+        filter: drop-shadow(0 0 min(5vw, 5vh) black)
     }
 </style>
 <script>
     const css = document.documentElement.style
-    function updateBoardTransformMatrix () {
-        const boardContainer = document.getElementById('board-container')
-        const w = boardContainer.clientWidth
-        const h = boardContainer.clientHeight
 
-        if (w > h) {
-            css.setProperty('--board-depth-transform', (h - w) / (h * w))
-            css.setProperty('--board-vertical-transform', 0)
-        }
-        else {
-            css.setProperty('--board-depth-transform', 0)
-            css.setProperty('--board-vertical-transform', (w - h)/2)
-        }
+    let paddingTop = 0.05
+    let paddingBottom = 0.15
+    let maxBoardSteepness = 1.15
+
+    function updateBoardTransform () {
+        const w = Math.min(window.innerWidth, window.innerHeight * maxBoardSteepness)
+        css.setProperty('--board-side-length', `${w}px`)
+
+        const top_h = paddingTop * window.innerHeight
+        const bottom_h = paddingBottom * window.innerHeight
+        const h = window.innerHeight - top_h - bottom_h
+
+        css.setProperty('--board-translateX', `${(window.innerWidth - w) / 2}px`)
+        if (w < h) css.setProperty('--board-translateY', `${(w - h) / 2 - bottom_h}px`)
+        else css.setProperty('--board-translateY', `${-bottom_h}px`)
+        css.setProperty('--board-depth-transform', Math.min(0, (h - w) / (h * w)))
     }
-    updateBoardTransformMatrix()
+    updateBoardTransform()
 
-    window.addEventListener('resize', updateBoardTransformMatrix)
+    window.addEventListener('resize', updateBoardTransform)
 
-    let paddingTop = 0
-    let paddingBottom = 0
-
-    function updatePaddingTop () {
-        const value = document.getElementById('padding-top-slider').value/10
-        document.getElementById('top-padding').innerHTML = `Top Padding: ${(value).toFixed(1).padStart(4, "0")}%`
-        css.setProperty('--board-padding-top', `${value}vh`)
-        paddingTop = value
-        updateBoardDistance()
-        updateBoardTransformMatrix()
-    }
-    updatePaddingTop()
-
-    function updatePaddingBottom () {
-        const value = document.getElementById('padding-bottom-slider').value/10
-        document.getElementById('bottom-padding').innerHTML = `Bottom Padding: ${(value).toFixed(1).padStart(4, "0")}%`
-        css.setProperty('--board-padding-bottom', `${value}vh`)
-        paddingBottom = value
-        updateBoardDistance()
-        updateBoardTransformMatrix()
-    }
-    updatePaddingBottom()
-
-    function updateBoardDistance () {
-        const slider = document.getElementById('max-board-width-slider')
-        const value = slider.value
-        slider.min = 100 - (paddingTop + paddingBottom)
-        document.getElementById('max-board-width').innerHTML = `Maximum Board Steepness: ${(value/100).toFixed(2)}vh`
-        css.setProperty('--max-board-width', `${value}vh`)
-        updateBoardTransformMatrix()
+    function zoom(card) {
+        removeZoom()
+        card.parentElement.classList.add('zoom')
     }
 
-    function updateGuides() {
-        console.log(document.getElementById('guides').checked)
-        if (document.getElementById('guides').checked == true) {
-            css.setProperty('--guides', 'unset')
-        }
-        else {
-            css.setProperty('--guides', 'none')
-        }
+    function removeZoom() {
+        document.querySelectorAll('.zoom').forEach(elm => {
+            console.log('test')
+            elm.classList.remove('zoom')
+        })
+    }
+
+    function updateDebugBackground() {
+        css.setProperty('--debug-background', document.getElementById('debug-background').checked ? 'unset' : 'none')
     }
 </script>
