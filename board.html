@@ -2,33 +2,38 @@
 <html>
     <body>
         <div id="background"></div>
-        <div style="display: flex;">
-            Darken Background:
-            <input id="debug-background" type="checkbox" oninput="updateDebugBackground()">
-        </div>
-        <div id="board" onclick="removeZoom()"></div>
-        <div class="board-transform"><img src="https://images.pokemontcg.io/swsh11/79_hires.png" style="position: absolute; width: 12.5%; bottom: 77.5%; left: 14%; transform: rotate(180deg)" onclick="zoom(this)"></div>
-        <div class="board-transform">
-            <img src="https://images.pokemontcg.io/swsh11/70_hires.png" style="position: absolute; width: 12.5%; left: 43.75%; bottom: 53.5%; transform: rotate(180deg)" onclick="zoom(this)">
-            <img src="holofoil.gif" style="position: absolute; width: 12.5%; left: 43.75%; bottom: 53.5%; transform: rotate(180deg); pointer-events: none; mix-blend-mode: color-dodge">
-        </div>
-        <div class="board-transform"><img src="https://images.pokemontcg.io/swsh6/61_hires.png" style="position: absolute; width: 12.5%; left: 43.75%; bottom: 29%;" onclick="zoom(this)"></div>
-        <div class="board-transform">
-            <img src="https://images.pokemontcg.io/sv1/86_hires.png" style="position: absolute; width: 12.5%; bottom: 5%; left: 18%" onclick="zoom(this)">
-            <img src="holofoil.gif" style="position: absolute; width: 12.5%; bottom: 5%; left: 18%; pointer-events: none; mix-blend-mode: color-dodge;">
-        </div>
-        <div class="board-transform"><img src="https://images.pokemontcg.io/swsh12/68_hires.png" style="position: absolute; width: 12.5%; bottom: 5%; left: 31.7%" onclick="zoom(this)"></div>
+        <div style="display: flex;">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-speed', `${this.value/20}s`); document.getElementById('animation-speed-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-speed-text">0.35s (Default: 0.35s)</div></div>
+        <div style="display: flex;">Debug Background:<input type="checkbox" oninput="css.setProperty('--debug-background', this.checked ? 'unset' : 'none')"></div>
+        <div style="display: flex;">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
+        <div style="display: flex;">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
+        <div style="display: flex;">Zoom Idle Animation:<input type="checkbox" oninput="css.setProperty('--zoom-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
+        <game-board></game-board>        
+        <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh11/79_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/swsh11/70_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform position-board-user-active holofoil" image-src="https://images.pokemontcg.io/swsh6/61_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform position-board-user-bench-1 holofoil" image-src="https://images.pokemontcg.io/sv1/86_hires.png"></card-image></pokemon-card>
+        <pokemon-card class="board-transform position-board-user-bench-2" image-src="https://images.pokemontcg.io/swsh12/68_hires.png"></pokemon-card>
     </body>
 </html>
 <style>
     :root {
+        /* Global Variables */
+        --card-width-height-ratio: calc(868/1212);
+        --card-height-width-ratio: calc(1212/868);
+
+        /* Settings */
         --debug-background: none;
+        --opponent-card-rotation: 180deg;
+        --holofoil-display: inline-block;
+        --animation-speed: 0.35s;
+        --zoom-card-idle-speed: 5s; /* Set to 0s to disable idle animation */
     }
 
     body {
         background-color: #1b7f64;
         color: white;
         font-family: monospace;
+        overflow: hidden;
     }
 
     #background {
@@ -43,14 +48,14 @@
         pointer-events: none;
     }
 
-    #board {
+    game-board {
         background-image: url('board.png');
         background-repeat: no-repeat;
         background-size: 100% 100%;
         pointer-events: all !important;
     }
 
-    .board-transform, #board {
+    .board-transform, game-board {
         position: absolute;
         width: var(--board-side-length);
         height: var(--board-side-length);
@@ -59,31 +64,110 @@
         transform-origin: center bottom;
         transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,0,0,1);
         pointer-events: none;
-        z-index: 0;
-        transition: all 0.4s;
+        transition: all var(--animation-speed);
+        z-index: -1;
     }
     .board-transform * {
-        pointer-events: all;
-        transition: all 0.4s;
+        transition: all var(--animation-speed);
     }
 
     .board-transform.zoom {
         transform: translateX(var(--board-translateX)) translateY(0);
-        /* background-color: rgba(255,0,0,0.5); */
         z-index: 1000;
-        /* pointer-events: all; */
     }
-    .board-transform.zoom * {
-        width: 40% !important;
-        bottom: 20% !important;
-        left: 0% !important;
-        transform: rotate(0) !important;
+    .board-transform.zoom .card-position {
+        width: calc(0.4 * var(--board-side-length)); /* Width of zoomed card = 40% of board width */
+        bottom: calc(50vh - 0.4 * var(--board-side-length) * var(--card-height-width-ratio) / 2); /* Zoomed card is centered vertically */
+        left: max(calc(-1 * (100vw - var(--board-side-length)) / 2 + 3.125vw), calc(var(--board-side-length)/2 - 0.4 * var(--board-side-length) - 6.25vw)); /* Zoomed card's left side is at least 1/32 away from the edge of the screen, and the right side is 1/16 away from the center if there's room*/
+        animation: card-idle var(--zoom-card-idle-speed) ease-in-out infinite;
+        animation-delay: var(--animation-speed); /* Wait for zoom to complete before idle animation begins */
+    }
+    @keyframes card-idle {
+        0% {
+            transform: translateY(0%);
+            animation-timing-function: ease-out;
+        }
+        25% {
+            transform: translateY(0.78125%);
+            animation-timing-function: ease-in-out;
+        }
+        75% {
+            transform: translateY(-0.78125%);
+            animation-timing-function: ease-in;
+        }
+    }
+    .board-transform.zoom card-image {
+        transform: rotate(0) matrix3d(1,0,0,0.0003,0,1,0,0,0,0,1,0,0,0,0,1);
     }
 
-    /* img {
+    .card-position {
+        position: absolute;
+        aspect-ratio: var(--card-width-height-ratio);
+    }
+
+    .position-board-user-active .card-position {
+        width: 12.5%;
+        left: 43.75%;
+        bottom: 29%;
+    }
+
+    .position-board-user-bench-1 .card-position {
+        width: 12.5%;
+        bottom: 5%;
+        left: 18%
+    }
+
+    .position-board-user-bench-2 .card-position {
+        width: 12.5%;
+        bottom: 5%;
+        left: 31.7%
+    }
+
+    .position-board-opponent-active .card-position {
+        width: 12.5%;
+        left: 43.75%;
+        bottom: 53.5%;
+    }
+    .position-board-opponent-active card-image {
+        transform: rotate(var(--opponent-card-rotation))
+    }
+
+    .position-board-opponent-bench-5 .card-position {
+        width: 12.5%;
+        bottom: 77.5%;
+        left: 14%;
+    }
+    .position-board-opponent-bench-5 card-image {
+        transform: rotate(var(--opponent-card-rotation))
+    }
+
+    card-image {
+        position: absolute;
+        aspect-ratio: var(--card-width-height-ratio);
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        border-radius: 4.5% / calc(4.5% * var(--card-width-height-ratio));
+        pointer-events: all;
+    }
+
+    .holofoil card-image::after {
+        content: "";
+        display: var(--holofoil-display);
+        width: 100%;
+        height: 100%;
+        background-image: url('holofoil.gif');
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        mix-blend-mode: color-dodge;
+        border-radius: 4.5% / calc(4.5% * var(--card-width-height-ratio));
+    }
+
+    /* card-image {
         filter: drop-shadow(0 0 min(0.5vw, 0.5vh) rgba(0,0,0,0.5))
     }
-    .board-transform.zoom img {
+    .board-transform.zoom card-image {
         filter: drop-shadow(0 0 min(5vw, 5vh) black)
     } */
 </style>
@@ -92,7 +176,7 @@
 
     let paddingTop = 0.05
     let paddingBottom = 0.15
-    let maxBoardSteepness = 1.15
+    let maxBoardSteepness = 1.10
 
     function updateBoardTransform () {
         const w = Math.min(window.innerWidth, window.innerHeight * maxBoardSteepness)
@@ -111,19 +195,38 @@
 
     window.addEventListener('resize', updateBoardTransform)
 
-    function zoom(card) {
-        removeZoom()
-        card.parentElement.classList.add('zoom')
-    }
+    class GameBoard extends HTMLElement {
+        constructor () {
+            super()
+            this.setAttribute('onclick', 'this.onClick()')
+        }
 
-    function removeZoom() {
-        document.querySelectorAll('.zoom').forEach(elm => {
-            console.log('test')
-            elm.classList.remove('zoom')
-        })
+        onClick () {
+            document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+        }
     }
+    customElements.define("game-board", GameBoard)
 
-    function updateDebugBackground() {
-        css.setProperty('--debug-background', document.getElementById('debug-background').checked ? 'unset' : 'none')
+    class PokemonCard extends HTMLElement {
+        constructor () {
+            super()
+            this.setAttribute('onclick', 'this.onClick()')
+        }
+
+        connectedCallback () {
+            this.positionContainer = document.createElement('div')
+            this.positionContainer.classList.add('card-position')
+            this.appendChild(this.positionContainer)
+
+            this.image = document.createElement('card-image')
+            this.image.style["backgroundImage"] = `url('${this.getAttribute('image-src')}')`
+            this.positionContainer.appendChild(this.image)
+        }
+        
+        onClick () {
+            document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+            this.classList.add('zoom')
+        }
     }
+    customElements.define("pokemon-card", PokemonCard)
 </script>
