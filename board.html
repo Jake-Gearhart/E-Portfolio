@@ -13,7 +13,7 @@
             <span id="bottom-padding">Bottom Padding: XX.X%</span> 
             <input id="padding-bottom-slider" type="range" min="0" max="500" value="150" oninput="updatePaddingBottom()" style="flex-grow: 1;"> 
             <span id="max-board-width">Maximum Board Steepness: X.XXvh</span> 
-            <input id="max-board-width-slider" type="range" min="0" max="2000" value="1100" oninput="updateBoardDistance()" style="flex-grow: 1;">
+            <input id="max-board-width-slider" type="range" min="0" max="200" value="110" oninput="updateBoardDistance()" style="flex-grow: 1;">
         </div>
         <div id="top-padding-indicator"></div>
         <div id="bottom-padding-indicator"></div>
@@ -21,8 +21,10 @@
             <div id="board">
                 <img src="https://images.pokemontcg.io/swsh11/79_hires.png" style="position: absolute; width: 12.5%; top: 5%; left: 14%; transform: rotate(180deg)">
                 <img src="https://images.pokemontcg.io/swsh11/70_hires.png" style="position: absolute; width: 12.5%; left: 43.75%; top: 29%; transform: rotate(180deg)">
+                <img src="holofoil.gif" style="position: absolute; width: 12.5%; left: 43.75%; top: 29%; transform: rotate(180deg); pointer-events: none; mix-blend-mode: color-dodge">
                 <img src="https://images.pokemontcg.io/swsh6/61_hires.png" style="position: absolute; width: 12.5%; left: 43.75%; bottom: 29%;">
                 <img src="https://images.pokemontcg.io/sv1/86_hires.png" style="position: absolute; width: 12.5%; bottom: 5%; left: 18%">
+                <img src="holofoil.gif" style="position: absolute; width: 12.5%; bottom: 5%; left: 18%; pointer-events: none; mix-blend-mode: color-dodge;">
                 <img src="https://images.pokemontcg.io/swsh12/68_hires.png" style="position: absolute; width: 12.5%; bottom: 5%; left: 31.7%">
             </div>
         </div>
@@ -152,8 +154,8 @@
 
     function updateBoardDistance () {
         const slider = document.getElementById('max-board-width-slider')
-        const value = slider.value/10
-        slider.min = 1000 - (paddingTop * 10 + paddingBottom * 10)
+        const value = slider.value
+        slider.min = 100 - (paddingTop + paddingBottom)
         document.getElementById('max-board-width').innerHTML = `Maximum Board Steepness: ${(value/100).toFixed(2)}vh`
         css.setProperty('--max-board-width', `${value}vh`)
         updateBoardTransformMatrix()
