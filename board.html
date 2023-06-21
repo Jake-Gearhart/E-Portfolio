@@ -12,7 +12,7 @@
         <div class="debug" onclick="clearCardSelections()">——————————————————————————————————————————</div>
         <div class="debug" onclick="clearCardSelections()">Click cards to select them</div>
         <div class="debug" onclick="clearCardSelections()">Press S to stack them (Will be drag soon)</div>
-        <div class="debug" style="position: absolute; bottom: 0;" onclick="clearCardSelections()">0003</div>
+        <div class="debug" style="position: absolute; bottom: 0;" onclick="clearCardSelections()">0004</div>
         <game-board></game-board>        
         <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh11/79_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/swsh11/70_hires.png"></pokemon-card>
@@ -289,6 +289,10 @@
     function clearCardSelections () {
         document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
         document.querySelectorAll('.selected').forEach(elm => elm.classList.remove('selected'))
+        clearCardStack()
+    }
+
+    function clearCardStack () {
         document.querySelectorAll('.stack').forEach(elm => elm.classList.remove('stack'))
         css.setProperty('--stack-time', '0.35s')
         mouseUpdateStackPos = false
@@ -331,9 +335,7 @@
         
         onClick () {
             this.classList.contains('selected') ? this.classList.remove('selected') : this.classList.add('selected')
-            document.querySelectorAll('.stack').forEach(elm => elm.classList.remove('stack'))
-            css.setProperty('--stack-time', '0.35s')
-            mouseUpdateStackPos = false
+            clearCardStack()
         }
 
         onRightClick () {
@@ -342,6 +344,7 @@
                 document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
                 this.classList.add('zoom')
             }
+            clearCardStack()
         }
     }
     customElements.define("pokemon-card", PokemonCard)
