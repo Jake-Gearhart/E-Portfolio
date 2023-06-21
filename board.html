@@ -9,6 +9,9 @@
         <div style="display: flex;">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
         <div style="display: flex;">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
         <div style="display: flex;">Zoom Idle Animation:<input type="checkbox" oninput="css.setProperty('--zoom-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
+        <div>——————————————————————————————————————————</div>
+        <div>Click cards to select them</div>
+        <div>Press S to stack them (Will be drag soon)</div>
         <game-board></game-board>        
         <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh11/79_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/swsh11/70_hires.png"></pokemon-card>
@@ -51,7 +54,7 @@
         left: 0;
         top: 0;
         background-color: var(--background-color);
-        z-index: -3 !important;
+        z-index: -2;
     }
 
     game-board {
@@ -59,7 +62,7 @@
         background-repeat: no-repeat;
         background-size: 100% 100%;
         pointer-events: all !important;
-        z-index: -2 !important;
+        z-index: -1;
     }
 
     .board-transform, game-board {
@@ -72,7 +75,6 @@
         transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,0,0,1);
         pointer-events: none;
         transition: all var(--animation-time);
-        z-index: -1;
     }
     .board-transform * {
         transition: all var(--animation-time);
