@@ -12,7 +12,7 @@
         <div class="debug" onclick="clearCardSelections()">——————————————————————————————————————————</div>
         <div class="debug" onclick="clearCardSelections()">Click cards to select them</div>
         <div class="debug" onclick="clearCardSelections()">Press S to stack them (Will be drag soon)</div>
-        <div class="debug" style="position: absolute; bottom: 0;" onclick="clearCardSelections()">0001</div>
+        <div class="debug" style="position: absolute; bottom: 0;" onclick="clearCardSelections()">0002</div>
         <game-board></game-board>        
         <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh11/79_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/swsh11/70_hires.png"></pokemon-card>
@@ -79,6 +79,7 @@
         transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,0,0,1);
         pointer-events: none;
         transition: all var(--animation-time);
+        z-index: 0;
     }
     .board-transform * {
         transition: all var(--animation-time);
@@ -259,8 +260,6 @@
 
     window.addEventListener('resize', updateBoardTransform)
     function setStackPos () {
-        // css.setProperty('--stack-left', `calc(${mousePos.x/window.innerWidth * 100}vw - var(--card-width) / 2)`)
-        // css.setProperty('--stack-bottom', `calc(${(1 - mousePos.y/window.innerHeight) * 100}vh - var(--card-height) / 2)`)
         css.setProperty('--stack-left', `calc(${100*mousePos.x/window.innerWidth}vw - var(--board-side-length)/2)`)
         css.setProperty('--stack-bottom', `calc(${100 * (window.innerHeight - mousePos.y) / window.innerHeight}vh - var(--board-side-length)/2)`)
         console.log('triggered')
@@ -272,7 +271,8 @@
         if (mouseUpdateStackPos == true) setStackPos()
     })
     window.addEventListener('keydown', () => {
-        if (event.key == 's' && document.querySelectorAll('.selected').length > 0 &&document.querySelectorAll('.stack').length == 0) {
+        if (event.key == 's' && document.querySelectorAll('.selected').length > 0 && document.querySelectorAll('.stack').length == 0) {
+            document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
             document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
             const steps = 16
             for (let i = 0; i < steps+1; i++) {
