@@ -2,7 +2,8 @@
 <html>
     <body>
         <div id="background" onclick="clearCardSelections()"></div>
-        <div style="display: flex;">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-speed', `${this.value/20}s`); document.getElementById('animation-speed-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-speed-text">0.35s (Default: 0.35s)</div></div>
+        <div style="display: flex;">Max Board Width:<input type="range" min="100" max="200" value="135" oninput="maxBoardWidth = this.value/100; updateBoardTransform(); document.getElementById('max-board-width-text').innerHTML = `${(this.value/100).toFixed(2)} × Height`"><div id="max-board-width-text">1.35 × Height</div></div>
+        <div style="display: flex;">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-time', `${this.value/20}s`); document.getElementById('animation-time-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-time-text">0.35s (Default: 0.35s)</div></div>
         <div style="display: flex;">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
         <div style="display: flex;">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
         <div style="display: flex;">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
@@ -19,21 +20,20 @@
 <style>
     :root {
         /* Global Variables */
-        /* --card-width-height-ratio: calc(868/1212);
-        --card-height-width-ratio: calc(1212/868); */
-        /* GIMP Legacy Drop Shadow, 0 offset, 75% opacity, 64px */
-
-        --card-width: 862;
-        --card-height: 1152;
-        --card-width-height-ratio: calc(var(--card-width)/var(--card-height));
-        --card-height-width-ratio: calc(var(--card-height)/var(--card-width));
+        --card-width-height-ratio: calc(862/1152);
+        --card-height-width-ratio: calc(1152/862);
+        --card-width: 15%;
+        --card-height: calc(var(--card-width) * var(--card-height-width-ratio));
+        --stack-left: 10%;
+        --stack-bottom: 10%;
+        --stack-time: 0.35s;
 
         /* Settings */
         --background-color: #1b7f64;
         --opponent-card-rotation: 180deg;
         --card-shadow-image: url('card-shadow.png');
         --holofoil-display: inline-block;
-        --animation-speed: 0.35s;
+        --animation-time: 0.35s;
         --zoom-card-idle-speed: 5s; /* Set to 0s to disable idle animation */
     }
 
@@ -51,7 +51,7 @@
         left: 0;
         top: 0;
         background-color: var(--background-color);
-        z-index: -1;
+        z-index: -3 !important;
     }
 
     game-board {
@@ -59,6 +59,7 @@
         background-repeat: no-repeat;
         background-size: 100% 100%;
         pointer-events: all !important;
+        z-index: -2 !important;
     }
 
     .board-transform, game-board {
@@ -70,11 +71,11 @@
         transform-origin: center bottom;
         transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,0,0,1);
         pointer-events: none;
-        transition: all var(--animation-speed);
+        transition: all var(--animation-time);
         z-index: -1;
     }
     .board-transform * {
-        transition: all var(--animation-speed);
+        transition: all var(--animation-time);
     }
 
     .board-transform.zoom {
@@ -86,7 +87,7 @@
         bottom: calc(50vh - 0.4 * var(--board-side-length) * var(--card-height-width-ratio) / 2); /* Zoomed card is centered vertically */
         left: max(calc(-1 * (100vw - var(--board-side-length)) / 2 + 3.125vw), calc(var(--board-side-length)/2 - 0.4 * var(--board-side-length) - 6.25vw)); /* Zoomed card's left side is at least 1/32 away from the edge of the screen, and the right side is 1/16 away from the center if there's room*/
         animation: card-idle var(--zoom-card-idle-speed) ease-in-out infinite;
-        animation-delay: var(--animation-speed); /* Wait for zoom to complete before idle animation begins */
+        animation-delay: var(--animation-time); /* Wait for zoom to complete before idle animation begins */
     }
     @keyframes card-idle {
         0% {
@@ -106,31 +107,46 @@
         transform: rotate(0) matrix3d(1,0,0,0.0003,0,1,0,0,0,0,1,0,0,0,0,1);
     }
 
+    pokemon-card {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0%;
+        bottom: 0%;
+
+    }
+    .stack {
+        left: var(--stack-left);
+        bottom: var(--stack-bottom);
+        transition: all var(--animation-time), left var(--stack-time), bottom var(--stack-time) !important;
+        z-index: 500;
+    }
+
     .card-position {
         position: absolute;
         aspect-ratio: var(--card-width-height-ratio);
     }
 
     .position-board-user-active .card-position {
-        width: 15%;
+        width: var(--card-width);
         left: 42.5%;
         bottom: 29%;
     }
 
     .position-board-user-bench-1 .card-position {
-        width: 15%;
+        width: var(--card-width);
+        left: 16.5%;
         bottom: 4%;
-        left: 16.5%
     }
 
     .position-board-user-bench-2 .card-position {
-        width: 15%;
+        width: var(--card-width);
+        left: 30.7%;
         bottom: 4%;
-        left: 30.7%
     }
 
     .position-board-opponent-active .card-position {
-        width: 15%;
+        width: var(--card-width);
         left: 42.5%;
         bottom: 52.5%;
     }
@@ -139,12 +155,27 @@
     }
 
     .position-board-opponent-bench-5 .card-position {
-        width: 15%;
-        bottom: 75.89%;
+        width: var(--card-width);
         left: 13%;
+        bottom: 75.89%;
     }
     .position-board-opponent-bench-5 .card-shadow {
         transform: rotate(var(--opponent-card-rotation))
+    }
+
+    .stack .card-position {
+        position: absolute;
+        /* display: var(--stack-display); */
+        /* left: var(--stack-left); */
+        /* bottom: var(--stack-bottom); */
+        /* transition: all var(--stack-time); */
+
+        left: calc(50% - var(--card-width) / 2);
+        bottom: calc(50% - var(--card-height) / 2);
+
+    }
+    .board-transform.stack {
+        transform: none;
     }
 
     .card-shadow {
@@ -154,32 +185,35 @@
         background-image: var(--card-shadow-image);
         background-repeat: no-repeat;
         background-size: 100% 100%;
-        transition: all var(--animation-speed), background calc(var(--animation-speed) / 4) !important;
+        transition: all var(--animation-time), background calc(var(--animation-time) / 4) !important;
     }
     .selected .card-shadow {
         background-image: url('card-highlight.png') !important;
-        animation: selected-card calc(var(--animation-speed) * 5) ease-in-out infinite;
-        /* filter: brightness(1.1); */
+        animation: selected-card calc(5s/3) ease-in-out infinite;
+        filter: brightness(1.125);
     }
     @keyframes selected-card {
         0% {
-            filter: brightness(1);
+            filter: brightness(1.125);
         }
         50% {
-            filter: brightness(1.15);
+            filter: brightness(1.25);
         }
     }
 
     card-image {
         position: absolute;
         aspect-ratio: 734/1024;
-        width: calc(73400%/var(--card-width));
-        top: calc(6400%/var(--card-height));
-        left: calc(6400%/var(--card-width));
+        width: calc(73400%/862);
+        top: calc(6400%/1152);
+        left: calc(6400%/862);
         background-repeat: no-repeat;
         background-size: 100% 100%;
         border-radius: 4.5% / calc(4.5% * var(--card-width-height-ratio));
         pointer-events: all;
+    }
+    .stack card-image {
+        pointer-events: none;
     }
 
     .holofoil card-image::after {
@@ -194,23 +228,16 @@
         mix-blend-mode: color-dodge;
         border-radius: 4.5% / calc(4.5% * var(--card-width-height-ratio));
     }
-
-    /* card-image {
-        filter: drop-shadow(0 0 min(0.5vw, 0.5vh) rgba(0,0,0,0.5))
-    }
-    .board-transform.zoom card-image {
-        filter: drop-shadow(0 0 min(5vw, 5vh) black)
-    } */
 </style>
 <script>
     const css = document.documentElement.style
 
     let paddingTop = 0.05
     let paddingBottom = 0.15
-    let maxBoardSteepness = 1.10
+    let maxBoardWidth = 1.35
 
     function updateBoardTransform () {
-        const w = Math.min(window.innerWidth, window.innerHeight * maxBoardSteepness)
+        const w = Math.min(window.innerWidth, window.innerHeight * (maxBoardWidth - paddingTop - paddingBottom))
         css.setProperty('--board-side-length', `${w}px`)
 
         const top_h = paddingTop * window.innerHeight
@@ -225,10 +252,40 @@
     updateBoardTransform()
 
     window.addEventListener('resize', updateBoardTransform)
+    function setStackPos () {
+        // css.setProperty('--stack-left', `calc(${mousePos.x/window.innerWidth * 100}vw - var(--card-width) / 2)`)
+        // css.setProperty('--stack-bottom', `calc(${(1 - mousePos.y/window.innerHeight) * 100}vh - var(--card-height) / 2)`)
+        css.setProperty('--stack-left', `calc(${100*mousePos.x/window.innerWidth}vw - var(--board-side-length)/2)`)
+        css.setProperty('--stack-bottom', `calc(${100 * (window.innerHeight - mousePos.y) / window.innerHeight}vh - var(--board-side-length)/2)`)
+        console.log('triggered')
+    }
+    let mouseUpdateStackPos = false
+    let mousePos
+    window.addEventListener('mousemove', (event) => {
+        mousePos = {'x': event.clientX, 'y': event.clientY}
+        if (mouseUpdateStackPos == true) setStackPos()
+    })
+    window.addEventListener('keydown', () => {
+        if (event.key == 's' && document.querySelectorAll('.selected').length > 0 &&document.querySelectorAll('.stack').length == 0) {
+            document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
+            const steps = 16
+            for (let i = 0; i < steps+1; i++) {
+                setTimeout(() => {
+                    setStackPos()
+                    css.setProperty('--stack-time', `${0.35 * (1 - i / steps)}s`)
+                    // console.log(`${0.35 * (1 - i / steps)}s`)
+                    if (i == steps) mouseUpdateStackPos = true
+                }, 350/steps*i);
+            }
+        }
+    })
 
     function clearCardSelections () {
         document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
         document.querySelectorAll('.selected').forEach(elm => elm.classList.remove('selected'))
+        document.querySelectorAll('.stack').forEach(elm => elm.classList.remove('stack'))
+        css.setProperty('--stack-time', '0.35s')
+        mouseUpdateStackPos = false
     }
 
     class GameBoard extends HTMLElement {
@@ -262,6 +319,8 @@
             this.image = document.createElement('card-image')
             this.image.style["backgroundImage"] = `url('${this.getAttribute('image-src')}')`
             this.shadowContainer.appendChild(this.image)
+
+            this.image.setAttribute('mousedown', 'console.log("down")')
         }
         
         onClick () {
@@ -270,8 +329,10 @@
 
         onRightClick () {
             event.preventDefault()
-            document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
-            this.classList.add('zoom')
+            if (!this.classList.contains('stack')) {
+                document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+                this.classList.add('zoom')
+            }
         }
     }
     customElements.define("pokemon-card", PokemonCard)
