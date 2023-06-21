@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <div id="background"></div>
+        <div id="background" onclick="clearCardSelections()"></div>
         <div style="display: flex;">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-speed', `${this.value/20}s`); document.getElementById('animation-speed-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-speed-text">0.35s (Default: 0.35s)</div></div>
-        <div style="display: flex;">Debug Background:<input type="checkbox" oninput="css.setProperty('--debug-background', this.checked ? 'unset' : 'none')"></div>
+        <div style="display: flex;">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
         <div style="display: flex;">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
+        <div style="display: flex;">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
         <div style="display: flex;">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
         <div style="display: flex;">Zoom Idle Animation:<input type="checkbox" oninput="css.setProperty('--zoom-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
         <game-board></game-board>        
@@ -18,19 +19,26 @@
 <style>
     :root {
         /* Global Variables */
-        --card-width-height-ratio: calc(868/1212);
-        --card-height-width-ratio: calc(1212/868);
+        /* --card-width-height-ratio: calc(868/1212);
+        --card-height-width-ratio: calc(1212/868); */
+        /* GIMP Legacy Drop Shadow, 0 offset, 75% opacity, 64px */
+
+        --card-width: 862;
+        --card-height: 1152;
+        --card-width-height-ratio: calc(var(--card-width)/var(--card-height));
+        --card-height-width-ratio: calc(var(--card-height)/var(--card-width));
 
         /* Settings */
-        --debug-background: none;
+        --background-color: #1b7f64;
         --opponent-card-rotation: 180deg;
+        --card-shadow-image: url('card-shadow.png');
         --holofoil-display: inline-block;
         --animation-speed: 0.35s;
         --zoom-card-idle-speed: 5s; /* Set to 0s to disable idle animation */
     }
 
     body {
-        background-color: #1b7f64;
+        /* background-color: #1b7f64; */
         color: white;
         font-family: monospace;
         overflow: hidden;
@@ -38,14 +46,12 @@
 
     #background {
         position: absolute;
-        display: var(--debug-background);
         width: 100%;
         height: 100%;
         left: 0;
         top: 0;
-        background-color: #166953;
+        background-color: var(--background-color);
         z-index: -1;
-        pointer-events: none;
     }
 
     game-board {
@@ -96,7 +102,7 @@
             animation-timing-function: ease-in;
         }
     }
-    .board-transform.zoom card-image {
+    .board-transform.zoom .card-shadow {
         transform: rotate(0) matrix3d(1,0,0,0.0003,0,1,0,0,0,0,1,0,0,0,0,1);
     }
 
@@ -106,46 +112,70 @@
     }
 
     .position-board-user-active .card-position {
-        width: 12.5%;
-        left: 43.75%;
+        width: 15%;
+        left: 42.5%;
         bottom: 29%;
     }
 
     .position-board-user-bench-1 .card-position {
-        width: 12.5%;
-        bottom: 5%;
-        left: 18%
+        width: 15%;
+        bottom: 4%;
+        left: 16.5%
     }
 
     .position-board-user-bench-2 .card-position {
-        width: 12.5%;
-        bottom: 5%;
-        left: 31.7%
+        width: 15%;
+        bottom: 4%;
+        left: 30.7%
     }
 
     .position-board-opponent-active .card-position {
-        width: 12.5%;
-        left: 43.75%;
-        bottom: 53.5%;
+        width: 15%;
+        left: 42.5%;
+        bottom: 52.5%;
     }
-    .position-board-opponent-active card-image {
+    .position-board-opponent-active .card-shadow {
         transform: rotate(var(--opponent-card-rotation))
     }
 
     .position-board-opponent-bench-5 .card-position {
-        width: 12.5%;
-        bottom: 77.5%;
-        left: 14%;
+        width: 15%;
+        bottom: 75.89%;
+        left: 13%;
     }
-    .position-board-opponent-bench-5 card-image {
+    .position-board-opponent-bench-5 .card-shadow {
         transform: rotate(var(--opponent-card-rotation))
+    }
+
+    .card-shadow {
+        position: absolute;
+        aspect-ratio: var(--card-width-height-ratio);
+        width: 100%;
+        background-image: var(--card-shadow-image);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        transition: all var(--animation-speed), background calc(var(--animation-speed) / 4) !important;
+    }
+    .selected .card-shadow {
+        background-image: url('card-highlight.png') !important;
+        animation: selected-card calc(var(--animation-speed) * 5) ease-in-out infinite;
+        /* filter: brightness(1.1); */
+    }
+    @keyframes selected-card {
+        0% {
+            filter: brightness(1);
+        }
+        50% {
+            filter: brightness(1.15);
+        }
     }
 
     card-image {
         position: absolute;
-        aspect-ratio: var(--card-width-height-ratio);
-        width: 100%;
-        height: 100%;
+        aspect-ratio: 734/1024;
+        width: calc(73400%/var(--card-width));
+        top: calc(6400%/var(--card-height));
+        left: calc(6400%/var(--card-width));
         background-repeat: no-repeat;
         background-size: 100% 100%;
         border-radius: 4.5% / calc(4.5% * var(--card-width-height-ratio));
@@ -154,6 +184,7 @@
 
     .holofoil card-image::after {
         content: "";
+        position: absolute;
         display: var(--holofoil-display);
         width: 100%;
         height: 100%;
@@ -195,6 +226,11 @@
 
     window.addEventListener('resize', updateBoardTransform)
 
+    function clearCardSelections () {
+        document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+        document.querySelectorAll('.selected').forEach(elm => elm.classList.remove('selected'))
+    }
+
     class GameBoard extends HTMLElement {
         constructor () {
             super()
@@ -202,7 +238,7 @@
         }
 
         onClick () {
-            document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+            clearCardSelections()
         }
     }
     customElements.define("game-board", GameBoard)
@@ -210,6 +246,7 @@
     class PokemonCard extends HTMLElement {
         constructor () {
             super()
+            this.setAttribute('oncontextmenu', 'this.onRightClick()')
             this.setAttribute('onclick', 'this.onClick()')
         }
 
@@ -218,12 +255,21 @@
             this.positionContainer.classList.add('card-position')
             this.appendChild(this.positionContainer)
 
+            this.shadowContainer = document.createElement('div')
+            this.shadowContainer.classList.add('card-shadow')
+            this.positionContainer.appendChild(this.shadowContainer)
+
             this.image = document.createElement('card-image')
             this.image.style["backgroundImage"] = `url('${this.getAttribute('image-src')}')`
-            this.positionContainer.appendChild(this.image)
+            this.shadowContainer.appendChild(this.image)
         }
         
         onClick () {
+            this.classList.contains('selected') ? this.classList.remove('selected') : this.classList.add('selected')
+        }
+
+        onRightClick () {
+            event.preventDefault()
             document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
             this.classList.add('zoom')
         }
