@@ -2,16 +2,17 @@
 <html>
     <body>
         <div id="background" onclick="clearCardSelections()"></div>
-        <div style="display: flex;">Max Board Width:<input type="range" min="100" max="200" value="135" oninput="maxBoardWidth = this.value/100; updateBoardTransform(); document.getElementById('max-board-width-text').innerHTML = `${(this.value/100).toFixed(2)} × Height`"><div id="max-board-width-text">1.35 × Height</div></div>
-        <div style="display: flex;">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-time', `${this.value/20}s`); document.getElementById('animation-time-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-time-text">0.35s (Default: 0.35s)</div></div>
-        <div style="display: flex;">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
-        <div style="display: flex;">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
-        <div style="display: flex;">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
-        <div style="display: flex;">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
-        <div style="display: flex;">Zoom Idle Animation:<input type="checkbox" oninput="css.setProperty('--zoom-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
-        <div>——————————————————————————————————————————</div>
-        <div>Click cards to select them</div>
-        <div>Press S to stack them (Will be drag soon)</div>
+        <div class="debug" onclick="clearCardSelections()">Max Board Width:<input type="range" min="100" max="200" value="135" oninput="maxBoardWidth = this.value/100; updateBoardTransform(); document.getElementById('max-board-width-text').innerHTML = `${(this.value/100).toFixed(2)} × Height`"><div id="max-board-width-text">1.35 × Height</div></div>
+        <div class="debug" onclick="clearCardSelections()">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-time', `${this.value/20}s`); document.getElementById('animation-time-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-time-text">0.35s (Default: 0.35s)</div></div>
+        <div class="debug" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
+        <div class="debug" onclick="clearCardSelections()">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
+        <div class="debug" onclick="clearCardSelections()">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
+        <div class="debug" onclick="clearCardSelections()">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
+        <div class="debug" onclick="clearCardSelections()">Zoom Idle Animation:<input type="checkbox" oninput="css.setProperty('--zoom-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
+        <div class="debug" onclick="clearCardSelections()">——————————————————————————————————————————</div>
+        <div class="debug" onclick="clearCardSelections()">Click cards to select them</div>
+        <div class="debug" onclick="clearCardSelections()">Press S to stack them (Will be drag soon)</div>
+        <div class="debug" style="position: absolute; bottom: 0;" onclick="clearCardSelections()">0001</div>
         <game-board></game-board>        
         <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh11/79_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/swsh11/70_hires.png"></pokemon-card>
@@ -40,8 +41,11 @@
         --zoom-card-idle-speed: 5s; /* Set to 0s to disable idle animation */
     }
 
+    .debug {
+        display: flex;
+    }
+
     body {
-        /* background-color: #1b7f64; */
         color: white;
         font-family: monospace;
         overflow: hidden;
