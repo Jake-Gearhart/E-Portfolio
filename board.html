@@ -2,7 +2,7 @@
 <html>
     <body>
         <div id="background" onclick="clearCardSelections()"></div>
-        <div style="display: flex">Show Settings<input type="checkbox" onclick="clearCardSelections(); document.querySelectorAll('.debug').forEach(elm => {if (this.checked == true) elm.classList.remove('debug-hidden'); else elm.classList.add('debug-hidden')})"></div>
+        <div style="display: flex">Show Settings:<input type="checkbox" onclick="clearCardSelections(); document.querySelectorAll('.debug').forEach(elm => {if (this.checked == true) elm.classList.remove('debug-hidden'); else elm.classList.add('debug-hidden')})"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">------------------------ Settings ------------------------</div>
         <div class="debug debug-hidden">(Will be visible in a settings menu)</div>
         <div class="debug debug-hidden">-</div>
@@ -198,6 +198,9 @@
     .board-transform.stack {
         transform: none;
     }
+    .stack .card-shadow {
+        transform: rotate(0);
+    }
 
     .card-shadow {
         position: absolute;
@@ -287,24 +290,24 @@
         mousePos = {'x': event.clientX, 'y': event.clientY}
         if (mouseUpdateStackPos == true) setStackPos()
     })
-    let stackAnimationTimeouts = []
-    window.addEventListener('keydown', () => {
-        if (event.key == 's' && document.querySelectorAll('.selected').length > 0 && document.querySelectorAll('.stack').length == 0) {
-            document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
-            document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
-            const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
-            const steps = Math.round(animationTimeSeconds * 48)
-            for (let i = 0; i < steps+1; i++) {
-                stackAnimationTimeouts.push(
-                        setTimeout(() => {
-                        setStackPos()
-                        css.setProperty('--stack-time', `${animationTimeSeconds * (1 - i / steps)}s`)
-                        if (i == steps) mouseUpdateStackPos = true
-                    }, animationTimeSeconds*1000/steps*i)
-                )
-            }
-        }
-    })
+
+    // window.addEventListener('keydown', () => {
+    //     if (event.key == 's' && document.querySelectorAll('.selected').length > 0 && document.querySelectorAll('.stack').length == 0) {
+    //         document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+    //         document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
+    //         const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
+    //         const steps = Math.round(animationTimeSeconds * 48)
+    //         for (let i = 0; i < steps+1; i++) {
+    //             stackAnimationTimeouts.push(
+    //                     setTimeout(() => {
+    //                     setStackPos()
+    //                     css.setProperty('--stack-time', `${animationTimeSeconds * (1 - i / steps)}s`)
+    //                     if (i == steps) mouseUpdateStackPos = true
+    //                 }, animationTimeSeconds*1000/steps*i)
+    //             )
+    //         }
+    //     }
+    // })
 
     function clearCardSelections () {
         document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
@@ -312,6 +315,7 @@
         clearCardStack()
     }
 
+    let stackAnimationTimeouts = []
     function clearCardStack () {
         document.querySelectorAll('.stack').forEach(elm => elm.classList.remove('stack'))
         css.setProperty('--stack-time', getComputedStyle(document.body).getPropertyValue('--animation-time'))
@@ -351,7 +355,8 @@
             this.image.style["backgroundImage"] = `url('${this.getAttribute('image-src')}')`
             this.shadowContainer.appendChild(this.image)
 
-            this.image.setAttribute('mousedown', 'console.log("down")')
+            this.image.setAttribute('draggable', 'true')
+            this.image.setAttribute('ondragstart', 'this.closest("pokemon-card").onDragStart(event)')
         }
         
         onClick () {
@@ -369,6 +374,29 @@
                 clearCardStack()
             }
             else (this.classList.remove('zoom'))
+        }
+
+        onDragStart (event) {
+            event.preventDefault()
+            this.classList.add('selected')
+            if (document.querySelectorAll('.stack').length == 0) {
+                document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+                document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
+                const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
+                const steps = Math.round(animationTimeSeconds * 48)
+                for (let i = 0; i < steps+1; i++) {
+                    stackAnimationTimeouts.push(
+                            setTimeout(() => {
+                            setStackPos()
+                            css.setProperty('--stack-time', `${animationTimeSeconds * (1 - i / steps)}s`)
+                            if (i == steps) mouseUpdateStackPos = true
+                        }, animationTimeSeconds*1000/steps*i)
+                    )
+                }
+            }
+            else {
+                clearCardStack()
+            }
         }
     }
     customElements.define("pokemon-card", PokemonCard)
