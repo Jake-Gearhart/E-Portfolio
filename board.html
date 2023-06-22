@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+</head>
 <html>
     <body>
         <div id="background" onclick="clearCardSelections()"></div>
@@ -8,6 +12,7 @@
         <div class="debug debug-hidden">-</div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Max Board Bottom Width:<input type="range" min="100" max="300" value="135" oninput="maxBoardWidth = this.value/100; updateBoardTransform(); document.getElementById('max-board-width-text').innerHTML = `${(this.value/100).toFixed(2)} x Board Height (Default: 1.35)`"><div id="max-board-width-text">1.35 x Board Height (Default: 1.35)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-time', `${this.value/20}s`); document.getElementById('animation-time-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-time-text">0.35s (Default: 0.35s)</div></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Long Press Time (Touch Screen):<input type="range" min="0" max="300" value="50" oninput="longPressTime = this.value/100; document.getElementById('long-press-time-text').innerHTML = `${(this.value/100).toFixed(2)}s (Default: 0.50s)`"><div id="long-press-time-text">0.50s (Default: 0.50s)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
@@ -22,7 +27,7 @@
         <div class="debug debug-hidden">-</div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Click cards to select them</div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Press S to stack them (Will be drag soon)</div>
-        <div style="position: absolute; bottom: 0;">0006</div>
+        <div style="position: absolute; bottom: 0;">0007</div>
         <game-board></game-board>        
         <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
@@ -214,11 +219,10 @@
     .selected .card-shadow {
         background-image: url('card-highlight.png') !important;
         animation: selected-card calc(5s/3) ease-in-out infinite;
-        filter: brightness(1.125);
     }
     @keyframes selected-card {
         0% {
-            filter: brightness(1.125);
+            filter: brightness(1);
         }
         50% {
             filter: brightness(1.25);
@@ -260,6 +264,7 @@
     let paddingBottom = 0.15
     let maxBoardWidth = 1.35
     let boardHeightScale = 1
+    let longPressTime = 0.5
 
     function updateBoardTransform () {
         const w = Math.min(window.innerWidth, window.innerHeight * (maxBoardWidth / boardHeightScale - paddingTop - paddingBottom))
@@ -280,34 +285,19 @@
 
     window.addEventListener('resize', updateBoardTransform)
     function setStackPos () {
-        css.setProperty('--stack-left', `calc(${100*mousePos.x/window.innerWidth}vw - var(--board-width)/2)`)
-        css.setProperty('--stack-bottom', `calc(${100 * (window.innerHeight - mousePos.y) / window.innerHeight}vh - var(--board-height)/2)`)
-        console.log('triggered')
+        css.setProperty('--stack-left', `calc(${100*cursorPos.x/window.innerWidth}vw - var(--board-width)/2)`)
+        css.setProperty('--stack-bottom', `calc(${100 * (window.innerHeight - cursorPos.y) / window.innerHeight}vh - var(--board-height)/2)`)
     }
-    let mouseUpdateStackPos = false
-    let mousePos
+    let cursorUpdateStackPos = false
+    let cursorPos
     window.addEventListener('mousemove', (event) => {
-        mousePos = {'x': event.clientX, 'y': event.clientY}
-        if (mouseUpdateStackPos == true) setStackPos()
+        cursorPos = {'x': event.clientX, 'y': event.clientY}
+        if (cursorUpdateStackPos == true) setStackPos()
     })
-
-    // window.addEventListener('keydown', () => {
-    //     if (event.key == 's' && document.querySelectorAll('.selected').length > 0 && document.querySelectorAll('.stack').length == 0) {
-    //         document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
-    //         document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
-    //         const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
-    //         const steps = Math.round(animationTimeSeconds * 48)
-    //         for (let i = 0; i < steps+1; i++) {
-    //             stackAnimationTimeouts.push(
-    //                     setTimeout(() => {
-    //                     setStackPos()
-    //                     css.setProperty('--stack-time', `${animationTimeSeconds * (1 - i / steps)}s`)
-    //                     if (i == steps) mouseUpdateStackPos = true
-    //                 }, animationTimeSeconds*1000/steps*i)
-    //             )
-    //         }
-    //     }
-    // })
+    window.addEventListener('touchmove', (event) => {
+        cursorPos = {'x': event.touches[0].clientX, 'y': event.touches[0].clientY}
+        if (cursorUpdateStackPos == true) setStackPos()
+    })
 
     function clearCardSelections () {
         document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
@@ -320,7 +310,7 @@
         document.querySelectorAll('.stack').forEach(elm => elm.classList.remove('stack'))
         css.setProperty('--stack-time', getComputedStyle(document.body).getPropertyValue('--animation-time'))
         stackAnimationTimeouts.forEach(timeout => clearTimeout(timeout));
-        mouseUpdateStackPos = false
+        cursorUpdateStackPos = false
     }
 
     class GameBoard extends HTMLElement {
@@ -339,7 +329,15 @@
         constructor () {
             super()
             this.setAttribute('oncontextmenu', 'this.onRightClick()')
-            this.setAttribute('onclick', 'this.onClick()')
+            this.setAttribute('onmousedown', 'this.onMouseDown()')
+            this.setAttribute('ontouchstart', 'this.onTouchStart()')
+            this.setAttribute('onmouseup', 'this.onMouseUp()')
+            this.setAttribute('ontouchend', 'this.onMouseUp()')
+            this.setAttribute('onmouseleave', 'this.onMouseLeave()')
+            this.setAttribute('ontouchmove', 'this.onTouchMove(event)')
+            this.mouseDown = false
+            this.removeSelected = false
+            this.longPressTimer
         }
 
         connectedCallback () {
@@ -354,32 +352,51 @@
             this.image = document.createElement('card-image')
             this.image.style["backgroundImage"] = `url('${this.getAttribute('image-src')}')`
             this.shadowContainer.appendChild(this.image)
-
-            this.image.setAttribute('draggable', 'true')
-            this.image.setAttribute('ondragstart', 'this.closest("pokemon-card").onDragStart(event)')
         }
         
-        onClick () {
-            this.classList.contains('selected') ? this.classList.remove('selected') : this.classList.add('selected')
+        onMouseDown () {
+            this.mouseDown = true
+            if (!this.classList.contains('selected')) {
+                this.classList.add('selected')
+                this.removeSelected = false
+            }
+            else {
+                this.removeSelected = true
+            }
             clearCardStack()
         }
 
-        onRightClick () {
-            event.preventDefault()
-            if (!this.classList.contains('zoom')) {
-                if (!this.classList.contains('stack')) {
-                    document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
-                    this.classList.add('zoom')
-                }
-                clearCardStack()
+        onMouseUp () {
+            this.mouseDown = false
+            
+            if (this.removeSelected == true) {
+                this.classList.remove('selected')
+                this.removeSelected = false
             }
-            else (this.classList.remove('zoom'))
+            
+            clearTimeout(this.longPressTimer)
+            clearCardStack()
         }
 
-        onDragStart (event) {
+        onTouchStart () {
             event.preventDefault()
-            this.classList.add('selected')
-            if (document.querySelectorAll('.stack').length == 0) {
+            this.onMouseDown()
+            this.longPressTimer = setTimeout(() => {
+                this.zoom()
+            }, longPressTime * 1000);
+        }
+
+        onTouchMove (event) {
+            const rect = this.image.getBoundingClientRect()
+            const touchX = event.touches[0].clientX
+            const touchY = event.touches[0].clientY
+            if (rect.x > touchX || rect.x + rect.width < touchX || rect.y > touchY || rect.y + rect.height < touchY) this.onMouseLeave()
+        }
+
+        onMouseLeave () {
+            if (this.mouseDown == true && document.querySelectorAll('.stack').length == 0) {
+                clearTimeout(this.longPressTimer)
+                this.removeSelected = false
                 document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
                 document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
                 const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
@@ -389,14 +406,25 @@
                             setTimeout(() => {
                             setStackPos()
                             css.setProperty('--stack-time', `${animationTimeSeconds * (1 - i / steps)}s`)
-                            if (i == steps) mouseUpdateStackPos = true
+                            if (i == steps) cursorUpdateStackPos = true
                         }, animationTimeSeconds*1000/steps*i)
                     )
                 }
+                this.mouseDown = false
             }
-            else {
-                clearCardStack()
+        }
+
+        onRightClick () {
+            event.preventDefault()
+            this.zoom()
+        }
+
+        zoom () {
+            if (!this.classList.contains('zoom')) {
+                document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+                this.classList.add('zoom')
             }
+            else (this.classList.remove('zoom'))
         }
     }
     customElements.define("pokemon-card", PokemonCard)
