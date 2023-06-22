@@ -25,7 +25,7 @@
         <div class="debug debug-hidden" onclick="clearCardSelections()">Bottom Padding:<input type="range" min="0" max="50" value="5" oninput="paddingBottom = this.value/100; updateBoardTransform(); document.getElementById('padding-bottom-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.15)`"><div id="padding-bottom-text">0.15 x Board Height (Default: 0.15)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Right Click Menu:<input type="checkbox" oninput="debugRightClickMenu = this.checked ? true : false"></div>
-        <div style="position: absolute; bottom: 0;">0008</div>
+        <div style="position: absolute; bottom: 0;">0009</div>
         <game-board></game-board>        
         <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
@@ -189,11 +189,6 @@
 
     .stack .card-position {
         position: absolute;
-        /* display: var(--stack-display); */
-        /* left: var(--stack-left); */
-        /* bottom: var(--stack-bottom); */
-        /* transition: all var(--stack-time); */
-
         left: calc(50% - var(--card-width) / 2);
         bottom: calc(50% - var(--card-height) / 2);
 
@@ -216,7 +211,7 @@
     }
     .selected .card-shadow {
         background-image: url('card-highlight.png') !important;
-        animation: selected-card calc(5s/3) ease-in-out infinite;
+        animation: selected-card 2s ease-in-out infinite;
     }
     @keyframes selected-card {
         0% {
@@ -357,17 +352,7 @@
         }
         
         onMouseDown (event) {
-            if (event.button == 0) { //left click
-                this.mouseDown = true
-                if (!this.classList.contains('selected')) {
-                    this.classList.add('selected')
-                    this.removeSelected = false
-                }
-                else {
-                    this.removeSelected = true
-                }
-                clearCardStack()
-            }
+            if (event.button == 0) this.onClick() //left click
             else if (event.button == 2) this.zoom() //right click
         }
 
@@ -385,10 +370,22 @@
 
         onTouchStart () {
             event.preventDefault()
-            this.onMouseDown()
+            this.onClick()
             this.longPressTimer = setTimeout(() => {
                 this.zoom()
             }, longPressTime * 1000);
+        }
+
+        onClick() {
+            this.mouseDown = true
+            if (!this.classList.contains('selected')) {
+                this.classList.add('selected')
+                this.removeSelected = false
+            }
+            else {
+                this.removeSelected = true
+            }
+            clearCardStack()
         }
 
         onTouchMove (event) {
