@@ -2,20 +2,30 @@
 <html>
     <body>
         <div id="background" onclick="clearCardSelections()"></div>
-        <div class="debug" onclick="clearCardSelections()">Max Board Width:<input type="range" min="100" max="200" value="135" oninput="maxBoardWidth = this.value/100; updateBoardTransform(); document.getElementById('max-board-width-text').innerHTML = `${(this.value/100).toFixed(2)} × Height (Default: 1.35)`"><div id="max-board-width-text">1.35 × Height (Default: 1.35)</div></div>
-        <div class="debug" onclick="clearCardSelections()">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-time', `${this.value/20}s`); document.getElementById('animation-time-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-time-text">0.35s (Default: 0.35s)</div></div>
-        <div class="debug" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
-        <div class="debug" onclick="clearCardSelections()">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
-        <div class="debug" onclick="clearCardSelections()">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
-        <div class="debug" onclick="clearCardSelections()">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
-        <div class="debug" onclick="clearCardSelections()">Zoom Idle Animation:<input type="checkbox" oninput="css.setProperty('--zoom-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
-        <div class="debug" onclick="clearCardSelections()">——————————————————————————————————————————</div>
-        <div class="debug" onclick="clearCardSelections()">Click cards to select them</div>
-        <div class="debug" onclick="clearCardSelections()">Press S to stack them (Will be drag soon)</div>
-        <div class="debug" style="position: absolute; bottom: 0;" onclick="clearCardSelections()">0005</div>
+        <div style="display: flex">Show Settings<input type="checkbox" onclick="clearCardSelections(); document.querySelectorAll('.debug').forEach(elm => {if (this.checked == true) elm.classList.remove('debug-hidden'); else elm.classList.add('debug-hidden')})"></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">------------------------ Settings ------------------------</div>
+        <div class="debug debug-hidden">(Will be visible in a settings menu)</div>
+        <div class="debug debug-hidden">-</div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Max Board Bottom Width:<input type="range" min="100" max="300" value="135" oninput="maxBoardWidth = this.value/100; updateBoardTransform(); document.getElementById('max-board-width-text').innerHTML = `${(this.value/100).toFixed(2)} x Board Height (Default: 1.35)`"><div id="max-board-width-text">1.35 x Board Height (Default: 1.35)</div></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Animation Speed:<input type="range" min="0" max="100" value="7" oninput="css.setProperty('--animation-time', `${this.value/20}s`); document.getElementById('animation-time-text').innerHTML = `${(this.value/20).toFixed(2)}s (Default: 0.35s)`"><div id="animation-time-text">0.35s (Default: 0.35s)</div></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Zoom Idle Animation:<input type="checkbox" oninput="css.setProperty('--zoom-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">------------------------ Debugging -----------------------</div>
+        <div class="debug debug-hidden">(Only for testing)</div>
+        <div class="debug debug-hidden">-</div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Board Height:<input type="range" min="0" max="200" value="100" oninput="boardHeightScale = this.value/100; updateBoardTransform(); document.getElementById('board-height-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Width (Default: 1)`"><div id="board-height-text">1.00 x Screen Width (Default: 1.00)</div></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Top Padding:<input type="range" min="0" max="50" value="5" oninput="paddingTop = this.value/100; updateBoardTransform(); document.getElementById('padding-top-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.05)`"><div id="padding-top-text">0.05 x Board Height (Default: 0.05)</div></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Bottom Padding:<input type="range" min="0" max="50" value="5" oninput="paddingBottom = this.value/100; updateBoardTransform(); document.getElementById('padding-bottom-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.15)`"><div id="padding-bottom-text">0.15 x Board Height (Default: 0.15)</div></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
+        <div class="debug debug-hidden">-</div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Click cards to select them</div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Press S to stack them (Will be drag soon)</div>
+        <div style="position: absolute; bottom: 0;">0006</div>
         <game-board></game-board>        
-        <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh11/79_hires.png"></pokemon-card>
-        <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/swsh11/70_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-user-active holofoil" image-src="https://images.pokemontcg.io/swsh6/61_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-user-bench-1 holofoil" image-src="https://images.pokemontcg.io/sv1/86_hires.png"></card-image></pokemon-card>
         <pokemon-card class="board-transform position-board-user-bench-2" image-src="https://images.pokemontcg.io/swsh12/68_hires.png"></pokemon-card>
@@ -43,6 +53,10 @@
 
     .debug {
         display: flex;
+        background-color: rgba(0,0,0,0.5);
+    }
+    .debug-hidden {
+        display: none;
     }
 
     body {
@@ -58,7 +72,7 @@
         left: 0;
         top: 0;
         background-color: var(--background-color);
-        z-index: -2;
+        z-index: -3 !important;
     }
 
     game-board {
@@ -66,20 +80,20 @@
         background-repeat: no-repeat;
         background-size: 100% 100%;
         pointer-events: all !important;
-        z-index: -1;
+        z-index: -2 !important;
     }
 
     .board-transform, game-board {
         position: absolute;
-        width: var(--board-side-length);
-        height: var(--board-side-length);
+        width: var(--board-width);
+        height: var(--board-height);
         left: 0;
         bottom: 0;
         transform-origin: center bottom;
         transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,0,0,1);
         pointer-events: none;
         transition: all var(--animation-time);
-        z-index: 0;
+        z-index: -1;
     }
     .board-transform * {
         transition: all var(--animation-time);
@@ -90,9 +104,9 @@
         z-index: 1000;
     }
     .board-transform.zoom .card-position {
-        width: calc(0.4 * var(--board-side-length)); /* Width of zoomed card = 40% of board width */
-        bottom: calc(50vh - 0.4 * var(--board-side-length) * var(--card-height-width-ratio) / 2); /* Zoomed card is centered vertically */
-        left: max(calc(-1 * (100vw - var(--board-side-length)) / 2 + 3.125vw), calc(var(--board-side-length)/2 - 0.4 * var(--board-side-length) - 6.25vw)); /* Zoomed card's left side is at least 1/32 away from the edge of the screen, and the right side is 1/16 away from the center if there's room*/
+        width: calc(0.4 * var(--board-width)); /* Width of zoomed card = 40% of board width */
+        bottom: calc(50vh - 0.4 * var(--board-width) * var(--card-height-width-ratio) / 2); /* Zoomed card is centered vertically */
+        left: max(calc(-1 * (100vw - var(--board-width)) / 2 + 3.125vw), calc(var(--board-width)/2 - 0.4 * var(--board-width) - 6.25vw)); /* Zoomed card's left side is at least 1/32 away from the edge of the screen, and the right side is 1/16 away from the center if there's room*/
         animation: card-idle var(--zoom-card-idle-speed) ease-in-out infinite;
         animation-delay: var(--animation-time); /* Wait for zoom to complete before idle animation begins */
     }
@@ -242,26 +256,29 @@
     let paddingTop = 0.05
     let paddingBottom = 0.15
     let maxBoardWidth = 1.35
+    let boardHeightScale = 1
 
     function updateBoardTransform () {
-        const w = Math.min(window.innerWidth, window.innerHeight * (maxBoardWidth - paddingTop - paddingBottom))
-        css.setProperty('--board-side-length', `${w}px`)
+        const w = Math.min(window.innerWidth, window.innerHeight * (maxBoardWidth / boardHeightScale - paddingTop - paddingBottom))
+        css.setProperty('--board-width', `${w}px`)
+        const boardHeight = w * boardHeightScale
+        css.setProperty('--board-height', `${boardHeight}px`)
 
         const top_h = paddingTop * window.innerHeight
-        const bottom_h = paddingBottom * window.innerHeight
+        const bottom_h = paddingBottom * window.innerHeight 
         const h = window.innerHeight - top_h - bottom_h
 
         css.setProperty('--board-translateX', `${(window.innerWidth - w) / 2}px`)
-        if (w < h) css.setProperty('--board-translateY', `${(w - h) / 2 - bottom_h}px`)
+        if (boardHeight < h) css.setProperty('--board-translateY', `${(boardHeight - h) / 2 - bottom_h}px`)
         else css.setProperty('--board-translateY', `${-bottom_h}px`)
-        css.setProperty('--board-depth-transform', Math.min(0, (h - w) / (h * w)))
+        css.setProperty('--board-depth-transform', Math.min(0, (h - boardHeight) / (h * boardHeight)))
     }
     updateBoardTransform()
 
     window.addEventListener('resize', updateBoardTransform)
     function setStackPos () {
-        css.setProperty('--stack-left', `calc(${100*mousePos.x/window.innerWidth}vw - var(--board-side-length)/2)`)
-        css.setProperty('--stack-bottom', `calc(${100 * (window.innerHeight - mousePos.y) / window.innerHeight}vh - var(--board-side-length)/2)`)
+        css.setProperty('--stack-left', `calc(${100*mousePos.x/window.innerWidth}vw - var(--board-width)/2)`)
+        css.setProperty('--stack-bottom', `calc(${100 * (window.innerHeight - mousePos.y) / window.innerHeight}vh - var(--board-height)/2)`)
         console.log('triggered')
     }
     let mouseUpdateStackPos = false
@@ -270,18 +287,21 @@
         mousePos = {'x': event.clientX, 'y': event.clientY}
         if (mouseUpdateStackPos == true) setStackPos()
     })
+    let stackAnimationTimeouts = []
     window.addEventListener('keydown', () => {
         if (event.key == 's' && document.querySelectorAll('.selected').length > 0 && document.querySelectorAll('.stack').length == 0) {
             document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
             document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
-            const steps = 16
+            const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
+            const steps = Math.round(animationTimeSeconds * 48)
             for (let i = 0; i < steps+1; i++) {
-                setTimeout(() => {
-                    setStackPos()
-                    css.setProperty('--stack-time', `${0.35 * (1 - i / steps)}s`)
-                    // console.log(`${0.35 * (1 - i / steps)}s`)
-                    if (i == steps) mouseUpdateStackPos = true
-                }, 350/steps*i);
+                stackAnimationTimeouts.push(
+                        setTimeout(() => {
+                        setStackPos()
+                        css.setProperty('--stack-time', `${animationTimeSeconds * (1 - i / steps)}s`)
+                        if (i == steps) mouseUpdateStackPos = true
+                    }, animationTimeSeconds*1000/steps*i)
+                )
             }
         }
     })
@@ -294,7 +314,8 @@
 
     function clearCardStack () {
         document.querySelectorAll('.stack').forEach(elm => elm.classList.remove('stack'))
-        css.setProperty('--stack-time', '0.35s')
+        css.setProperty('--stack-time', getComputedStyle(document.body).getPropertyValue('--animation-time'))
+        stackAnimationTimeouts.forEach(timeout => clearTimeout(timeout));
         mouseUpdateStackPos = false
     }
 
@@ -340,11 +361,14 @@
 
         onRightClick () {
             event.preventDefault()
-            if (!this.classList.contains('stack')) {
-                document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
-                this.classList.add('zoom')
+            if (!this.classList.contains('zoom')) {
+                if (!this.classList.contains('stack')) {
+                    document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+                    this.classList.add('zoom')
+                }
+                clearCardStack()
             }
-            clearCardStack()
+            else (this.classList.remove('zoom'))
         }
     }
     customElements.define("pokemon-card", PokemonCard)
