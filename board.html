@@ -24,10 +24,8 @@
         <div class="debug debug-hidden" onclick="clearCardSelections()">Top Padding:<input type="range" min="0" max="50" value="5" oninput="paddingTop = this.value/100; updateBoardTransform(); document.getElementById('padding-top-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.05)`"><div id="padding-top-text">0.05 x Board Height (Default: 0.05)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Bottom Padding:<input type="range" min="0" max="50" value="5" oninput="paddingBottom = this.value/100; updateBoardTransform(); document.getElementById('padding-bottom-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.15)`"><div id="padding-bottom-text">0.15 x Board Height (Default: 0.15)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
-        <div class="debug debug-hidden">-</div>
-        <div class="debug debug-hidden" onclick="clearCardSelections()">Click cards to select them</div>
-        <div class="debug debug-hidden" onclick="clearCardSelections()">Press S to stack them (Will be drag soon)</div>
-        <div style="position: absolute; bottom: 0;">0007</div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Right Click Menu:<input type="checkbox" oninput="debugRightClickMenu = this.checked ? true : false"></div>
+        <div style="position: absolute; bottom: 0;">0008</div>
         <game-board></game-board>        
         <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
@@ -266,6 +264,8 @@
     let boardHeightScale = 1
     let longPressTime = 0.5
 
+    let debugRightClickMenu = false
+
     function updateBoardTransform () {
         const w = Math.min(window.innerWidth, window.innerHeight * (maxBoardWidth / boardHeightScale - paddingTop - paddingBottom))
         css.setProperty('--board-width', `${w}px`)
@@ -298,6 +298,9 @@
         cursorPos = {'x': event.touches[0].clientX, 'y': event.touches[0].clientY}
         if (cursorUpdateStackPos == true) setStackPos()
     })
+    window.addEventListener('contextmenu', (event) => {
+        if (debugRightClickMenu == false) event.preventDefault()
+    })
 
     function clearCardSelections () {
         document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
@@ -328,8 +331,7 @@
     class PokemonCard extends HTMLElement {
         constructor () {
             super()
-            this.setAttribute('oncontextmenu', 'this.onRightClick()')
-            this.setAttribute('onmousedown', 'this.onMouseDown()')
+            this.setAttribute('onmousedown', 'this.onMouseDown(event)')
             this.setAttribute('ontouchstart', 'this.onTouchStart()')
             this.setAttribute('onmouseup', 'this.onMouseUp()')
             this.setAttribute('ontouchend', 'this.onMouseUp()')
@@ -354,16 +356,19 @@
             this.shadowContainer.appendChild(this.image)
         }
         
-        onMouseDown () {
-            this.mouseDown = true
-            if (!this.classList.contains('selected')) {
-                this.classList.add('selected')
-                this.removeSelected = false
+        onMouseDown (event) {
+            if (event.button == 0) { //left click
+                this.mouseDown = true
+                if (!this.classList.contains('selected')) {
+                    this.classList.add('selected')
+                    this.removeSelected = false
+                }
+                else {
+                    this.removeSelected = true
+                }
+                clearCardStack()
             }
-            else {
-                this.removeSelected = true
-            }
-            clearCardStack()
+            else if (event.button == 2) this.zoom() //right click
         }
 
         onMouseUp () {
@@ -412,11 +417,6 @@
                 }
                 this.mouseDown = false
             }
-        }
-
-        onRightClick () {
-            event.preventDefault()
-            this.zoom()
         }
 
         zoom () {
