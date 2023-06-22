@@ -25,7 +25,7 @@
         <div class="debug debug-hidden" onclick="clearCardSelections()">Bottom Padding:<input type="range" min="0" max="50" value="5" oninput="paddingBottom = this.value/100; updateBoardTransform(); document.getElementById('padding-bottom-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.15)`"><div id="padding-bottom-text">0.15 x Board Height (Default: 0.15)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Right Click Menu:<input type="checkbox" oninput="debugRightClickMenu = this.checked ? true : false"></div>
-        <div style="position: absolute; bottom: 0;">0009</div>
+        <div style="position: absolute; bottom: 0;">0010</div>
         <game-board></game-board>        
         <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
         <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
@@ -44,6 +44,7 @@
         --stack-left: 10%;
         --stack-bottom: 10%;
         --stack-time: 0.35s;
+        --stack-lower-layer-display: unset;
 
         /* Settings */
         --background-color: #1b7f64;
@@ -143,7 +144,11 @@
         left: var(--stack-left);
         bottom: var(--stack-bottom);
         transition: all var(--animation-time), left var(--stack-time), bottom var(--stack-time) !important;
-        z-index: 500;
+        z-index: 550;
+    }
+    .stack:not(.stack-top) {
+        display: var(--stack-lower-layer-display);
+        z-index: 450;
     }
 
     .card-position {
@@ -400,7 +405,11 @@
                 clearTimeout(this.longPressTimer)
                 this.removeSelected = false
                 document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+                document.querySelectorAll('.stack-top').forEach(elm => elm.classList.remove('stack-top'))
+                this.classList.add('stack-top')
                 document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
+                cursorUpdateStackPos = false
+                css.setProperty('--stack-lower-layer-display', 'unset')
                 const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
                 const steps = Math.round(animationTimeSeconds * 48)
                 for (let i = 0; i < steps+1; i++) {
@@ -408,7 +417,10 @@
                             setTimeout(() => {
                             setStackPos()
                             css.setProperty('--stack-time', `${animationTimeSeconds * (1 - i / steps)}s`)
-                            if (i == steps) cursorUpdateStackPos = true
+                            if (i == steps) {
+                                cursorUpdateStackPos = true
+                                css.setProperty('--stack-lower-layer-display', 'none')
+                            }
                         }, animationTimeSeconds*1000/steps*i)
                     )
                 }
