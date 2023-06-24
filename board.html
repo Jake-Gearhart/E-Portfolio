@@ -5,7 +5,7 @@
 </head>
 <html>
     <body>
-        <div id="background" onclick="clearCardSelections()"></div>
+        <div id="background"></div>
         <div style="display: flex">Show Settings:<input type="checkbox" onclick="clearCardSelections(); document.querySelectorAll('.debug').forEach(elm => {if (this.checked == true) elm.classList.remove('debug-hidden'); else elm.classList.add('debug-hidden')})"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">------------------------ Settings ------------------------</div>
         <div class="debug debug-hidden">(Will be visible in a settings menu)</div>
@@ -25,13 +25,13 @@
         <div class="debug debug-hidden" onclick="clearCardSelections()">Bottom Padding:<input type="range" min="0" max="50" value="5" oninput="paddingBottom = this.value/100; updateBoardTransform(); document.getElementById('padding-bottom-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.15)`"><div id="padding-bottom-text">0.15 x Board Height (Default: 0.15)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Right Click Menu:<input type="checkbox" oninput="debugRightClickMenu = this.checked ? true : false"></div>
-        <div style="position: absolute; bottom: 0;">0011</div>
+        <div style="position: absolute; bottom: 0;">0012</div>
         <game-board></game-board>        
-        <pokemon-card class="board-transform position-board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
-        <pokemon-card class="board-transform position-board-opponent-active holofoil" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
-        <pokemon-card class="board-transform position-board-user-active holofoil" image-src="https://images.pokemontcg.io/swsh6/61_hires.png"></pokemon-card>
-        <pokemon-card class="board-transform position-board-user-bench-1 holofoil" image-src="https://images.pokemontcg.io/sv1/86_hires.png"></card-image></pokemon-card>
-        <pokemon-card class="board-transform position-board-user-bench-2" image-src="https://images.pokemontcg.io/swsh12/68_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform" position="board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform holofoil" position="board-opponent-active" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform holofoil" position="board-user-active" image-src="https://images.pokemontcg.io/swsh6/61_hires.png"></pokemon-card>
+        <pokemon-card class="board-transform holofoil" position="board-user-bench-1" image-src="https://images.pokemontcg.io/sv1/86_hires.png"></card-image></pokemon-card>
+        <pokemon-card class="board-transform" position="board-user-bench-2" image-src="https://images.pokemontcg.io/swsh12/68_hires.png"></pokemon-card>
     </body>
 </html>
 <style>
@@ -40,9 +40,8 @@
         --card-width-height-ratio: calc(862/1152);
         --card-height-width-ratio: calc(1152/862);
         --card-width: 15%;
-        --card-height: calc(var(--card-width) * var(--card-height-width-ratio));
-        --stack-left: 10%;
-        --stack-bottom: 10%;
+        --stack-left: 0;
+        --stack-bottom: 0;
         --stack-time: 0.35s;
         --stack-lower-layer-display: unset;
 
@@ -104,46 +103,32 @@
     }
 
     .board-transform.zoom {
-        transform: translateX(var(--board-translateX)) translateY(0);
+        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY));
         z-index: 1000;
     }
     .board-transform.zoom .card-position {
         width: calc(0.4 * var(--board-width)); /* Width of zoomed card = 40% of board width */
-        bottom: calc(50vh - 0.4 * var(--board-width) * var(--card-height-width-ratio) / 2); /* Zoomed card is centered vertically */
-        left: max(calc(-1 * (100vw - var(--board-width)) / 2 + 3.125vw), calc(var(--board-width)/2 - 0.4 * var(--board-width) - 6.25vw)); /* Zoomed card's left side is at least 1/32 away from the edge of the screen, and the right side is 1/16 away from the center if there's room*/
+        left: 25%;
+        bottom: calc(50vh + var(--board-translateY)); /* Zoomed card is centered vertically */
         animation: card-idle var(--zoom-card-idle-speed) ease-in-out infinite;
         animation-delay: var(--animation-time); /* Wait for zoom to complete before idle animation begins */
     }
     @keyframes card-idle {
         0% {
-            transform: translateY(0%);
-            animation-timing-function: ease-out;
+            transform: translate(-50%, 50%);
         }
         25% {
-            transform: translateY(0.78125%);
-            animation-timing-function: ease-in-out;
+            transform: translate(-50%, 50.78125%);
         }
         75% {
-            transform: translateY(-0.78125%);
-            animation-timing-function: ease-in;
+            transform: translate(-50%, 49.21875%);
         }
     }
     .board-transform.zoom .card-shadow {
         transform: rotate(0) matrix3d(1,0,0,0.0003,0,1,0,0,0,0,1,0,0,0,0,1);
     }
 
-    pokemon-card {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        left: 0%;
-        bottom: 0%;
-
-    }
     .stack {
-        left: var(--stack-left);
-        bottom: var(--stack-bottom);
-        transition: all var(--animation-time), left var(--stack-time), bottom var(--stack-time) !important;
         z-index: 550;
     }
     .stack:not(.stack-top) {
@@ -154,30 +139,30 @@
     .card-position {
         position: absolute;
         aspect-ratio: var(--card-width-height-ratio);
+        transform: translate(-50%, 50%);
     }
-
     .position-board-user-active .card-position {
         width: var(--card-width);
-        left: 42.5%;
-        bottom: 29%;
+        left: 50%;
+        bottom: 39%;
     }
 
     .position-board-user-bench-1 .card-position {
         width: var(--card-width);
-        left: 16.5%;
-        bottom: 4%;
+        left: 24.3%;
+        bottom: 14%;
     }
 
     .position-board-user-bench-2 .card-position {
         width: var(--card-width);
-        left: 30.7%;
-        bottom: 4%;
+        left: 38%;
+        bottom: 14%;
     }
 
     .position-board-opponent-active .card-position {
         width: var(--card-width);
-        left: 42.5%;
-        bottom: 52.5%;
+        left: 50%;
+        bottom: 61%;
     }
     .position-board-opponent-active .card-shadow {
         transform: rotate(var(--opponent-card-rotation))
@@ -185,8 +170,8 @@
 
     .position-board-opponent-bench-5 .card-position {
         width: var(--card-width);
-        left: 13%;
-        bottom: 75.89%;
+        left: 20.5%;
+        bottom: 86%;
     }
     .position-board-opponent-bench-5 .card-shadow {
         transform: rotate(var(--opponent-card-rotation))
@@ -194,12 +179,12 @@
 
     .stack .card-position {
         position: absolute;
-        left: calc(50% - var(--card-width) / 2);
-        bottom: calc(50% - var(--card-height) / 2);
-
+        left: var(--stack-left);
+        bottom: var(--stack-bottom);
+        transition: all var(--animation-time), left var(--stack-time), bottom var(--stack-time);
     }
     .board-transform.stack {
-        transform: none;
+        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) 
     }
     .stack .card-shadow {
         transform: rotate(0);
@@ -256,38 +241,40 @@
     }
 </style>
 <script>
-    const css = document.documentElement.style
-
     let paddingTop = 0.05
     let paddingBottom = 0.15
     let maxBoardWidth = 1.35
     let boardHeightScale = 1
     let longPressTime = 0.5
-
     let debugRightClickMenu = false
 
+    const css = document.documentElement.style
+
     function updateBoardTransform () {
-        const w = Math.min(window.innerWidth, window.innerHeight * (maxBoardWidth / boardHeightScale - paddingTop - paddingBottom))
-        css.setProperty('--board-width', `${w}px`)
-        const boardHeight = w * boardHeightScale
+        const windowWidth = window.innerWidth
+        const windowHeight = window.innerHeight
+        const boardWidth = Math.min(windowWidth, windowHeight * (maxBoardWidth / boardHeightScale - paddingTop - paddingBottom))
+        const boardHeight = boardWidth * boardHeightScale
+        const paddingTopPX = paddingTop * windowHeight
+        const paddingBottomPX = paddingBottom * windowHeight
+        const available2DHeight = windowHeight - paddingTopPX - paddingBottomPX
+        const offsetX = (windowWidth - boardWidth) / 2
+        const offsetY = Math.min(0, (boardHeight - available2DHeight) / 2) - paddingBottomPX
+
+        css.setProperty('--board-width', `${boardWidth}px`)
         css.setProperty('--board-height', `${boardHeight}px`)
-
-        const top_h = paddingTop * window.innerHeight
-        const bottom_h = paddingBottom * window.innerHeight 
-        const h = window.innerHeight - top_h - bottom_h
-
-        css.setProperty('--board-translateX', `${(window.innerWidth - w) / 2}px`)
-        if (boardHeight < h) css.setProperty('--board-translateY', `${(boardHeight - h) / 2 - bottom_h}px`)
-        else css.setProperty('--board-translateY', `${-bottom_h}px`)
-        css.setProperty('--board-depth-transform', Math.min(0, (h - boardHeight) / (h * boardHeight)))
+        css.setProperty('--board-translateX', `${offsetX}px`)
+        css.setProperty('--board-translateY', `${offsetY}px`)
+        css.setProperty('--board-depth-transform', Math.min(0, (available2DHeight - boardHeight) / (available2DHeight * boardHeight)))
     }
     updateBoardTransform()
 
     window.addEventListener('resize', updateBoardTransform)
     function setStackPos () {
-        css.setProperty('--stack-left', `calc(${100*cursorPos.x/window.innerWidth}vw - var(--board-width)/2)`)
-        css.setProperty('--stack-bottom', `calc(${100 * (window.innerHeight - cursorPos.y) / window.innerHeight}vh - var(--board-height)/2)`)
+        css.setProperty('--stack-left', `calc(${cursorPos.x}px - var(--board-translateX))`)
+        css.setProperty('--stack-bottom', `calc(${(window.innerHeight - cursorPos.y)}px + var(--board-translateY))`)
     }
+
     let cursorUpdateStackPos = false
     let cursorPos
     window.addEventListener('mousemove', (event) => {
@@ -300,6 +287,17 @@
     })
     window.addEventListener('contextmenu', (event) => {
         if (debugRightClickMenu == false) event.preventDefault()
+    })
+    window.addEventListener('click', (event) => {
+        if (event.target != document.body && event.target.tagName != 'CARD-IMAGE') {
+            clearCardSelections()
+        }
+    })
+    window.addEventListener('mouseup', (event) => {
+        if (document.querySelectorAll('.stack').length > 0 && event.target.dropCards) {
+            event.target.dropCards(document.querySelectorAll('.stack'))
+            clearCardSelections()
+        }
     })
 
     function clearCardSelections () {
@@ -316,18 +314,6 @@
         css.setProperty('--stack-time', getComputedStyle(document.body).getPropertyValue('--animation-time'))
         document.querySelectorAll('.stack').forEach(elm => elm.classList.remove('stack'))
     }
-
-    class GameBoard extends HTMLElement {
-        constructor () {
-            super()
-            this.setAttribute('onclick', 'this.onClick()')
-        }
-
-        onClick () {
-            clearCardSelections()
-        }
-    }
-    customElements.define("game-board", GameBoard)
 
     class PokemonCard extends HTMLElement {
         constructor () {
@@ -355,6 +341,19 @@
             this.image = document.createElement('card-image')
             this.image.style["backgroundImage"] = `url('${this.getAttribute('image-src')}')`
             this.shadowContainer.appendChild(this.image)
+
+            this.image.dropCards = (cards) => this.closest('pokemon-card').dropCards(cards)
+            this.position = this.position
+        }
+
+        get position () {
+            return this.getAttribute('position')
+        }
+
+        set position (value) {
+            this.classList.remove(`position-${this.position}`)
+            this.classList.add(`position-${value}`)
+            this.setAttribute('position', value)
         }
         
         onMouseDown (event) {
@@ -371,7 +370,6 @@
             }
             
             clearTimeout(this.longPressTimer)
-            clearCardStack()
         }
 
         onTouchStart () {
@@ -391,7 +389,13 @@
             else {
                 this.removeSelected = true
             }
-            clearCardStack()
+        }
+
+        dropCards (cards) {
+            console.log('recieving cards', cards)
+            cards.forEach(card => {
+                card.position = this.position
+            });
         }
 
         onTouchMove (event) {
