@@ -25,7 +25,7 @@
         <div class="debug debug-hidden" onclick="clearCardSelections()">Bottom Padding:<input type="range" min="0" max="50" value="5" oninput="paddingBottom = this.value/100; updateBoardTransform(); document.getElementById('padding-bottom-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.15)`"><div id="padding-bottom-text">0.15 x Board Height (Default: 0.15)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Right Click Menu:<input type="checkbox" oninput="debugRightClickMenu = this.checked ? true : false"></div>
-        <div style="position: absolute; bottom: 0;">0013</div>
+        <div style="position: absolute; bottom: 0;">0014</div>
         <game-board></game-board>
         <card-drop-zone position="board-user-discard"></card-drop-zone>
         <card-drop-zone position="board-user-active"></card-drop-zone>
@@ -135,7 +135,7 @@
         aspect-ratio: var(--card-image-width-height-ratio);
         border-radius: var(--card-image-border-radius);
         pointer-events: all;
-        transition: background-color calc(var(--animation-time)/2);
+        transition: background-color calc(var(--animation-time) / 4);
     }
     card-drop-zone .card-position:hover {
         background-color: rgba(255,255,255,0.125);
@@ -544,7 +544,7 @@
                 this.classList.add('stack-top')
                 document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
                 const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
-                const steps = Math.round(animationTimeSeconds * 48)
+                const steps = Math.round(animationTimeSeconds * 24)
                 for (let i = 0; i < steps+1; i++) {
                     stackAnimationTimeouts.push(
                             setTimeout(() => {
