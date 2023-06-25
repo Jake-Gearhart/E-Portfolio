@@ -16,7 +16,7 @@
         <div class="debug debug-hidden" onclick="clearCardSelections()">Opponent's Cards Face You:<input type="checkbox" oninput="css.setProperty('--opponent-card-rotation', this.checked ? '0deg' : '180deg')"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Card Shadow:<input type="checkbox" oninput="css.setProperty('--card-shadow-image', this.checked ? `url('card-shadow.png')` : 'none')" checked></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Holofoil:<input type="checkbox" oninput="css.setProperty('--holofoil-display', this.checked ? 'inline-block' : 'none')" checked></div>
-        <div class="debug debug-hidden" onclick="clearCardSelections()">Zoom Idle Animation:<input type="checkbox" oninput="css.setProperty('--zoom-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Focused Card Idle Animation:<input type="checkbox" oninput="css.setProperty('--focused-card-idle-speed', this.checked ? '5s' : '0s')" checked></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">------------------------ Debugging -----------------------</div>
         <div class="debug debug-hidden">(Only for testing)</div>
         <div class="debug debug-hidden">-</div>
@@ -25,9 +25,24 @@
         <div class="debug debug-hidden" onclick="clearCardSelections()">Bottom Padding:<input type="range" min="0" max="50" value="5" oninput="paddingBottom = this.value/100; updateBoardTransform(); document.getElementById('padding-bottom-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.15)`"><div id="padding-bottom-text">0.15 x Board Height (Default: 0.15)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Right Click Menu:<input type="checkbox" oninput="debugRightClickMenu = this.checked ? true : false"></div>
-        <div style="position: absolute; bottom: 0;">0012</div>
-        <game-board></game-board>        
-        <pokemon-card class="board-transform" position="board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
+        <div style="position: absolute; bottom: 0;">0013</div>
+        <game-board></game-board>
+        <card-drop-zone position="board-user-discard"></card-drop-zone>
+        <card-drop-zone position="board-user-active"></card-drop-zone>
+        <card-drop-zone position="board-user-bench-1"></card-drop-zone>
+        <card-drop-zone position="board-user-bench-2"></card-drop-zone>
+        <card-drop-zone position="board-user-bench-3"></card-drop-zone>
+        <card-drop-zone position="board-user-bench-4"></card-drop-zone>
+        <card-drop-zone position="board-user-bench-5"></card-drop-zone>
+        <card-drop-zone position="board-opponent-discard"></card-drop-zone>
+        <card-drop-zone position="board-opponent-active"></card-drop-zone>
+        <card-drop-zone position="board-opponent-bench-1"></card-drop-zone>
+        <card-drop-zone position="board-opponent-bench-2"></card-drop-zone>
+        <card-drop-zone position="board-opponent-bench-3"></card-drop-zone>
+        <card-drop-zone position="board-opponent-bench-4"></card-drop-zone>
+        <card-drop-zone position="board-opponent-bench-5"></card-drop-zone>
+        <card-drop-zone position="board-stadium"></card-drop-zone>
+        <pokemon-card position="board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
         <pokemon-card class="board-transform holofoil" position="board-opponent-active" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
         <pokemon-card class="board-transform holofoil" position="board-user-active" image-src="https://images.pokemontcg.io/swsh6/61_hires.png"></pokemon-card>
         <pokemon-card class="board-transform holofoil" position="board-user-bench-1" image-src="https://images.pokemontcg.io/sv1/86_hires.png"></card-image></pokemon-card>
@@ -37,9 +52,13 @@
 <style>
     :root {
         /* Global Variables */
+        --card-image-width-height-ratio: calc(734/1024);
         --card-width-height-ratio: calc(862/1152);
-        --card-height-width-ratio: calc(1152/862);
-        --card-width: 15%;
+        --card-image-width: 12.5%;
+        --card-width: calc(var(--card-image-width) * 862/734);
+
+        --card-image-border-radius: 4.5% / calc(4.5% * var(--card-image-width-height-ratio));
+
         --stack-left: 0;
         --stack-bottom: 0;
         --stack-time: 0.35s;
@@ -51,7 +70,23 @@
         --card-shadow-image: url('card-shadow.png');
         --holofoil-display: inline-block;
         --animation-time: 0.35s;
-        --zoom-card-idle-speed: 5s; /* Set to 0s to disable idle animation */
+        --focused-card-idle-speed: 5s; /* Set to 0s to disable idle animation */
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+
+        user-select: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+
+        object-fit: contain;
+
+        touch-action: manipulation;
     }
 
     .debug {
@@ -82,11 +117,31 @@
         background-image: url('board.png');
         background-repeat: no-repeat;
         background-size: 100% 100%;
-        pointer-events: all !important;
         z-index: -2 !important;
     }
 
-    .board-transform, game-board {
+    pokemon-card * {
+        position: absolute;
+        transition: all var(--animation-time);
+    }
+
+    .card-position {
+        aspect-ratio: var(--card-width-height-ratio);
+        transform: translate(-50%, 50%);
+    }
+    card-drop-zone .card-position {
+        position: absolute;
+        width: var(--card-image-width) !important;
+        aspect-ratio: var(--card-image-width-height-ratio);
+        border-radius: var(--card-image-border-radius);
+        pointer-events: all;
+        transition: background-color calc(var(--animation-time)/2);
+    }
+    card-drop-zone .card-position:hover {
+        background-color: rgba(255,255,255,0.125);
+    }
+
+    game-board, .position-board-user-discard, .position-board-user-active, .position-board-user-bench-1, .position-board-user-bench-2, .position-board-user-bench-3, .position-board-user-bench-4, .position-board-user-bench-5, .position-board-opponent-discard, .position-board-opponent-active, .position-board-opponent-bench-1, .position-board-opponent-bench-2, .position-board-opponent-bench-3, .position-board-opponent-bench-4, .position-board-opponent-bench-5, .position-board-stadium {
         position: absolute;
         width: var(--board-width);
         height: var(--board-height);
@@ -94,100 +149,122 @@
         bottom: 0;
         transform-origin: center bottom;
         transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,0,0,1);
-        pointer-events: none;
         transition: all var(--animation-time);
+        pointer-events: none;
         z-index: -1;
     }
-    .board-transform * {
-        transition: all var(--animation-time);
-    }
 
-    .board-transform.zoom {
-        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY));
-        z-index: 1000;
-    }
-    .board-transform.zoom .card-position {
-        width: calc(0.4 * var(--board-width)); /* Width of zoomed card = 40% of board width */
-        left: 25%;
-        bottom: calc(50vh + var(--board-translateY)); /* Zoomed card is centered vertically */
-        animation: card-idle var(--zoom-card-idle-speed) ease-in-out infinite;
-        animation-delay: var(--animation-time); /* Wait for zoom to complete before idle animation begins */
-    }
-    @keyframes card-idle {
-        0% {
-            transform: translate(-50%, 50%);
-        }
-        25% {
-            transform: translate(-50%, 50.78125%);
-        }
-        75% {
-            transform: translate(-50%, 49.21875%);
-        }
-    }
-    .board-transform.zoom .card-shadow {
-        transform: rotate(0) matrix3d(1,0,0,0.0003,0,1,0,0,0,0,1,0,0,0,0,1);
-    }
-
-    .stack {
-        z-index: 550;
-    }
-    .stack:not(.stack-top) {
-        display: var(--stack-lower-layer-display);
-        z-index: 450;
-    }
-
-    .card-position {
-        position: absolute;
-        aspect-ratio: var(--card-width-height-ratio);
-        transform: translate(-50%, 50%);
+    .position-board-user-discard .card-position {
+        width: var(--card-width);
+        left: 94.5%;
+        bottom: 19%;
     }
     .position-board-user-active .card-position {
         width: var(--card-width);
         left: 50%;
         bottom: 39%;
     }
-
     .position-board-user-bench-1 .card-position {
         width: var(--card-width);
         left: 24.3%;
         bottom: 14%;
     }
-
     .position-board-user-bench-2 .card-position {
         width: var(--card-width);
         left: 38%;
         bottom: 14%;
     }
-
+    .position-board-user-bench-3 .card-position {
+        width: var(--card-width);
+        left: 51.7%;
+        bottom: 14%;
+    }
+    .position-board-user-bench-4 .card-position {
+        width: var(--card-width);
+        left: 65.4%;
+        bottom: 14%;
+    }
+    .position-board-user-bench-5 .card-position {
+        width: var(--card-width);
+        left: 79.1%;
+        bottom: 14%;
+    }
+    .position-board-opponent-discard .card-position {
+        width: var(--card-width);
+        left: 5.5%;
+        bottom: 81%;
+    }
     .position-board-opponent-active .card-position {
         width: var(--card-width);
         left: 50%;
         bottom: 61%;
     }
-    .position-board-opponent-active .card-shadow {
-        transform: rotate(var(--opponent-card-rotation))
+    .position-board-opponent-bench-1 .card-position {
+        width: var(--card-width);
+        left: 75.3%;
+        bottom: 86%;
     }
-
+    .position-board-opponent-bench-2 .card-position {
+        width: var(--card-width);
+        left: 61.6%;
+        bottom: 86%;
+    }
+    .position-board-opponent-bench-3 .card-position {
+        width: var(--card-width);
+        left: 47.9%;
+        bottom: 86%;
+    }
+    .position-board-opponent-bench-4 .card-position {
+        width: var(--card-width);
+        left: 34.2%;
+        bottom: 86%;
+    }
     .position-board-opponent-bench-5 .card-position {
         width: var(--card-width);
         left: 20.5%;
         bottom: 86%;
     }
-    .position-board-opponent-bench-5 .card-shadow {
+    .position-board-stadium .card-position {
+        width: var(--card-width);
+        left: 27.8%;
+        bottom: 50%;
+    }
+
+    .position-board-opponent-discard .card-shadow, .position-board-opponent-active .card-shadow, .position-board-opponent-bench-1 .card-shadow, .position-board-opponent-bench-2 .card-shadow, .position-board-opponent-bench-3 .card-shadow, .position-board-opponent-bench-4 .card-shadow, .position-board-opponent-bench-5 .card-shadow {
         transform: rotate(var(--opponent-card-rotation))
     }
 
+    .stack {
+        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY));
+        z-index: 550;
+    }
+    .stack:not(.stack-top) {
+        display: var(--stack-lower-layer-display);
+        z-index: 450;
+    }
     .stack .card-position {
         position: absolute;
         left: var(--stack-left);
         bottom: var(--stack-bottom);
         transition: all var(--animation-time), left var(--stack-time), bottom var(--stack-time);
     }
-    .board-transform.stack {
-        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) 
-    }
     .stack .card-shadow {
         transform: rotate(0);
+    }
+
+    .focused {
+        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY));
+        z-index: 1000;
+    }
+    .focused .card-position {
+        width: calc(0.4 * var(--board-width)); /* Width of focuseded card = 40% of board width */
+        left: 25%;
+        bottom: calc(50vh + var(--board-translateY)); /* focuseded card is centered vertically */
+        animation: card-idle var(--focused-card-idle-speed) ease-in-out infinite;
+        animation-delay: var(--animation-time); /* Wait for focused to complete before idle animation begins */
+    }
+    .focused .card-shadow {
+        transform: rotate(0) matrix3d(1,0,0,0.0003,0,1,0,0,0,0,1,0,0,0,0,1);
     }
 
     .card-shadow {
@@ -220,7 +297,7 @@
         left: calc(6400%/862);
         background-repeat: no-repeat;
         background-size: 100% 100%;
-        border-radius: 4.5% / calc(4.5% * var(--card-width-height-ratio));
+        border-radius: var(--card-image-border-radius);
         pointer-events: all;
     }
     .stack card-image {
@@ -237,7 +314,21 @@
         background-repeat: no-repeat;
         background-size: 100% 100%;
         mix-blend-mode: color-dodge;
-        border-radius: 4.5% / calc(4.5% * var(--card-width-height-ratio));
+        border-radius: var(--card-image-border-radius);
+    }
+    @keyframes card-idle {
+        0% {
+            transform: translate(-50%, 50%);
+            animation-timing-function: ease-out;
+        }
+        25% {
+            transform: translate(-50%, 50.5%);
+            animation-timing-function: ease-in-out;
+        }
+        75% {
+            transform: translate(-50%, 49.5%);
+            animation-timing-function: ease-in;
+        }
     }
 </style>
 <script>
@@ -277,6 +368,10 @@
 
     let cursorUpdateStackPos = false
     let cursorPos
+    window.addEventListener('contextmenu', (event) => {
+        if (debugRightClickMenu == false) event.preventDefault()
+    })
+    window.addEventListener('dragstart', (event) => event.preventDefault())
     window.addEventListener('mousemove', (event) => {
         cursorPos = {'x': event.clientX, 'y': event.clientY}
         if (cursorUpdateStackPos == true) setStackPos()
@@ -285,23 +380,22 @@
         cursorPos = {'x': event.touches[0].clientX, 'y': event.touches[0].clientY}
         if (cursorUpdateStackPos == true) setStackPos()
     })
-    window.addEventListener('contextmenu', (event) => {
-        if (debugRightClickMenu == false) event.preventDefault()
-    })
     window.addEventListener('click', (event) => {
-        if (event.target != document.body && event.target.tagName != 'CARD-IMAGE') {
-            clearCardSelections()
-        }
+        if (event.target != document.body && event.target.tagName != 'CARD-IMAGE') clearCardSelections()
     })
-    window.addEventListener('mouseup', (event) => {
+    window.addEventListener('mousedown', (event) => dropStack(event))
+    window.addEventListener('mouseup', (event) => dropStack(event))
+
+    function dropStack (event) {
         if (document.querySelectorAll('.stack').length > 0 && event.target.dropCards) {
             event.target.dropCards(document.querySelectorAll('.stack'))
             clearCardSelections()
         }
-    })
+    }
+    
 
     function clearCardSelections () {
-        document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+        document.querySelectorAll('.focused').forEach(elm => elm.classList.remove('focused'))
         document.querySelectorAll('.selected').forEach(elm => elm.classList.remove('selected'))
         clearCardStack()
     }
@@ -315,6 +409,37 @@
         document.querySelectorAll('.stack').forEach(elm => elm.classList.remove('stack'))
     }
 
+    class CardDropZone extends HTMLElement {
+        constructor () {
+            super()
+            this.position = this.position
+        }
+
+        connectedCallback () {
+            this.cardContainer = document.createElement('hitbox')
+            this.cardContainer.classList.add('card-position')
+            this.appendChild(this.cardContainer)
+
+            this.cardContainer.dropCards = (cards) => this.dropCards(cards)
+        }
+
+        get position () {
+            return this.getAttribute('position')
+        }
+
+        set position (value) {
+            this.classList.remove(`position-${this.position}`)
+            this.classList.add(`position-${value}`)
+            this.setAttribute('position', value)
+        }
+
+        dropCards (cards) {
+            console.log('recieving cards', cards)
+            cards.forEach(card => card.position = this.position);
+        }
+    }
+    customElements.define("card-drop-zone", CardDropZone)
+
     class PokemonCard extends HTMLElement {
         constructor () {
             super()
@@ -327,9 +452,15 @@
             this.mouseDown = false
             this.removeSelected = false
             this.longPressTimer
+            this.position = this.position
+
+            // this.initialized = false
         }
 
         connectedCallback () {
+            // if (this.initialized == true) return //prevent connectedCallback from triggering every time card gets a new parent
+            // this.initialized = true
+
             this.positionContainer = document.createElement('div')
             this.positionContainer.classList.add('card-position')
             this.appendChild(this.positionContainer)
@@ -342,8 +473,7 @@
             this.image.style["backgroundImage"] = `url('${this.getAttribute('image-src')}')`
             this.shadowContainer.appendChild(this.image)
 
-            this.image.dropCards = (cards) => this.closest('pokemon-card').dropCards(cards)
-            this.position = this.position
+            this.image.dropCards = (cards) => this.dropCards(cards)
         }
 
         get position () {
@@ -358,7 +488,7 @@
         
         onMouseDown (event) {
             if (event.button == 0) this.onClick() //left click
-            else if (event.button == 2) this.zoom() //right click
+            else if (event.button == 2) this.focus() //right click
         }
 
         onMouseUp () {
@@ -376,11 +506,11 @@
             event.preventDefault()
             this.onClick()
             this.longPressTimer = setTimeout(() => {
-                this.zoom()
+                this.focus()
             }, longPressTime * 1000);
         }
 
-        onClick() {
+        onClick () {
             this.mouseDown = true
             if (!this.classList.contains('selected')) {
                 this.classList.add('selected')
@@ -392,10 +522,10 @@
         }
 
         dropCards (cards) {
-            console.log('recieving cards', cards)
-            cards.forEach(card => {
-                card.position = this.position
-            });
+            // console.log('recieving cards', cards)
+            // if (cards.length == 1) alert('1. Evolve\n2. Attach\n3. Switch')
+            // else alert('1. Attach')
+            cards.forEach(card => card.position = this.position);
         }
 
         onTouchMove (event) {
@@ -409,7 +539,7 @@
             if (this.mouseDown == true && document.querySelectorAll('.stack').length == 0) {
                 clearTimeout(this.longPressTimer)
                 this.removeSelected = false
-                document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
+                document.querySelectorAll('.focused').forEach(elm => elm.classList.remove('focused'))
                 document.querySelectorAll('.stack-top').forEach(elm => elm.classList.remove('stack-top'))
                 this.classList.add('stack-top')
                 document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
@@ -431,12 +561,12 @@
             }
         }
 
-        zoom () {
-            if (!this.classList.contains('zoom')) {
-                document.querySelectorAll('.zoom').forEach(elm => elm.classList.remove('zoom'))
-                this.classList.add('zoom')
+        focus () {
+            if (!this.classList.contains('focused')) {
+                document.querySelectorAll('.focused').forEach(elm => elm.classList.remove('focused'))
+                this.classList.add('focused')
             }
-            else (this.classList.remove('zoom'))
+            else (this.classList.remove('focused'))
         }
     }
     customElements.define("pokemon-card", PokemonCard)
