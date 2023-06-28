@@ -23,10 +23,12 @@
         <div class="debug debug-hidden" onclick="clearCardSelections()">Board Height:<input type="range" min="0" max="200" value="100" oninput="boardHeightScale = this.value/100; updateBoardTransform(); document.getElementById('board-height-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Width (Default: 1)`"><div id="board-height-text">1.00 x Screen Width (Default: 1.00)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Top Padding:<input type="range" min="0" max="50" value="5" oninput="paddingTop = this.value/100; updateBoardTransform(); document.getElementById('padding-top-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.05)`"><div id="padding-top-text">0.05 x Board Height (Default: 0.05)</div></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Bottom Padding:<input type="range" min="0" max="50" value="5" oninput="paddingBottom = this.value/100; updateBoardTransform(); document.getElementById('padding-bottom-text').innerHTML = `${(this.value/100).toFixed(2)} x Screen Height (Default: 0.15)`"><div id="padding-bottom-text">0.15 x Board Height (Default: 0.15)</div></div>
-        <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#166953' : '#1b7f64')"></div>
+        <div class="debug debug-hidden" onclick="clearCardSelections()">Debug Background:<input type="checkbox" oninput="css.setProperty('--background-color', this.checked ? '#449058' : '#1b7f64')"></div>
         <div class="debug debug-hidden" onclick="clearCardSelections()">Right Click Menu:<input type="checkbox" oninput="debugRightClickMenu = this.checked ? true : false"></div>
-        <div style="position: absolute; bottom: 0;">0014</div>
+        <div style="display: flex">Rotate Board:<input type="checkbox" onclick="const board = document.getElementsByTagName('game-board')[0]; if (this.checked) board.classList.add('opposite-view'); else board.classList.remove('opposite-view')"></div>
+        <div style="position: absolute; bottom: 0;">0015</div>
         <game-board></game-board>
+        <div id="twinleaf"></div>
         <card-drop-zone position="board-user-discard"></card-drop-zone>
         <card-drop-zone position="board-user-active"></card-drop-zone>
         <card-drop-zone position="board-user-bench-1"></card-drop-zone>
@@ -42,11 +44,12 @@
         <card-drop-zone position="board-opponent-bench-4"></card-drop-zone>
         <card-drop-zone position="board-opponent-bench-5"></card-drop-zone>
         <card-drop-zone position="board-stadium"></card-drop-zone>
-        <pokemon-card position="board-opponent-bench-5" image-src="https://images.pokemontcg.io/swsh12/147_hires.png"></pokemon-card>
-        <pokemon-card class="board-transform holofoil" position="board-opponent-active" image-src="https://images.pokemontcg.io/sv1/131_hires.png"></pokemon-card>
-        <pokemon-card class="board-transform holofoil" position="board-user-active" image-src="https://images.pokemontcg.io/swsh6/61_hires.png"></pokemon-card>
-        <pokemon-card class="board-transform holofoil" position="board-user-bench-1" image-src="https://images.pokemontcg.io/sv1/86_hires.png"></card-image></pokemon-card>
-        <pokemon-card class="board-transform" position="board-user-bench-2" image-src="https://images.pokemontcg.io/swsh12/68_hires.png"></pokemon-card>
+        <pokemon-card class="holofoil" position="board-opponent-bench-2" image-src="https://images.pokemontcg.io/base2/10_hires.png"></pokemon-card>
+        <pokemon-card position="board-opponent-bench-5" image-src="https://images.pokemontcg.io/base1/20_hires.png"></pokemon-card>
+        <pokemon-card class="holofoil" position="board-opponent-active" image-src="https://images.pokemontcg.io/base1/7_hires.png"></pokemon-card>
+        <pokemon-card class="holofoil" position="board-user-active" image-src="https://images.pokemontcg.io/swsh6/61_hires.png"></pokemon-card>
+        <pokemon-card class="holofoil" position="board-user-bench-1" image-src="https://images.pokemontcg.io/sv1/86_hires.png"></card-image></pokemon-card>
+        <pokemon-card position="board-user-bench-2" image-src="https://images.pokemontcg.io/swsh12/68_hires.png"></pokemon-card>
     </body>
 </html>
 <style>
@@ -55,6 +58,7 @@
         --card-image-width-height-ratio: calc(734/1024);
         --card-width-height-ratio: calc(862/1152);
         --card-image-width: 12.5%;
+        --card-image-border: calc(var(--card-image-width) * 29/734);
         --card-width: calc(var(--card-image-width) * 862/734);
 
         --card-image-border-radius: 4.5% / calc(4.5% * var(--card-image-width-height-ratio));
@@ -114,10 +118,31 @@
     }
 
     game-board {
-        background-image: url('board.png');
+        /* background-image: url('board.png'); */
         background-repeat: no-repeat;
         background-size: 100% 100%;
         z-index: -2 !important;
+        /* filter: brightness(0.5); */
+        /* background-color: #449058; */
+    }
+
+    #twinleaf, card-drop-zone {
+        /* mix-blend-mode: overlay; */
+        opacity: 0.75;
+    }
+    #twinleaf:after {
+        content: '';
+        position: absolute;
+        width: calc(var(--card-image-width) * 4/3 * 1024/734);
+        aspect-ratio: 1;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: url('twinleaf.png');
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        outline: var(--drop-zone-border-size) solid white;
+        border-radius: 100%;
     }
 
     pokemon-card * {
@@ -140,8 +165,32 @@
     card-drop-zone .card-position:hover {
         background-color: rgba(255,255,255,0.125);
     }
+    card-drop-zone .card-position::before {
+        content: '';
+        position: absolute;
+        width: calc(100% - 2 * var(--drop-zone-border-size));
+        height: calc(100% - 2 * var(--drop-zone-border-size));
+        border: var(--drop-zone-border-size) solid white;
+        border-radius: var(--card-image-border-radius);
+    }
+    card-drop-zone.position-board-user-active .card-position::before, card-drop-zone.position-board-user-bench-1 .card-position::before, card-drop-zone.position-board-user-bench-2 .card-position::before, card-drop-zone.position-board-user-bench-3 .card-position::before, card-drop-zone.position-board-user-bench-4 .card-position::before, card-drop-zone.position-board-user-bench-5 .card-position::before {
+        left: var(--drop-zone-border-size);
+        bottom: calc(-2 * var(--drop-zone-border-size));
+        height: var(--drop-zone-border-size);
+        border: none;
+        border-radius: var(--drop-zone-border-size);
+        background-color: white;
+    }
+    card-drop-zone.position-board-opponent-active .card-position::before, card-drop-zone.position-board-opponent-bench-1 .card-position::before, card-drop-zone.position-board-opponent-bench-2 .card-position::before, card-drop-zone.position-board-opponent-bench-3 .card-position::before, card-drop-zone.position-board-opponent-bench-4 .card-position::before, card-drop-zone.position-board-opponent-bench-5 .card-position::before {
+        left: var(--drop-zone-border-size);
+        top: calc(-2 * var(--drop-zone-border-size));
+        height: var(--drop-zone-border-size);
+        border: none;
+        border-radius: var(--drop-zone-border-size);
+        background-color: white;
+    }
 
-    game-board, .position-board-user-discard, .position-board-user-active, .position-board-user-bench-1, .position-board-user-bench-2, .position-board-user-bench-3, .position-board-user-bench-4, .position-board-user-bench-5, .position-board-opponent-discard, .position-board-opponent-active, .position-board-opponent-bench-1, .position-board-opponent-bench-2, .position-board-opponent-bench-3, .position-board-opponent-bench-4, .position-board-opponent-bench-5, .position-board-stadium {
+    game-board, #twinleaf, .position-board-user-discard, .position-board-user-active, .position-board-user-bench-1, .position-board-user-bench-2, .position-board-user-bench-3, .position-board-user-bench-4, .position-board-user-bench-5, .position-board-opponent-discard, .position-board-opponent-active, .position-board-opponent-bench-1, .position-board-opponent-bench-2, .position-board-opponent-bench-3, .position-board-opponent-bench-4, .position-board-opponent-bench-5, .position-board-stadium {
         position: absolute;
         width: var(--board-width);
         height: var(--board-height);
@@ -154,79 +203,83 @@
         z-index: -1;
     }
 
+    game-board.opposite-view, game-board.opposite-view ~ #twinleaf, game-board.opposite-view ~ .position-board-user-discard, game-board.opposite-view ~ .position-board-user-active, game-board.opposite-view ~ .position-board-user-bench-1, game-board.opposite-view ~ .position-board-user-bench-2, game-board.opposite-view ~ .position-board-user-bench-3, game-board.opposite-view ~ .position-board-user-bench-4, game-board.opposite-view ~ .position-board-user-bench-5, game-board.opposite-view ~ .position-board-opponent-discard, game-board.opposite-view ~ .position-board-opponent-active, game-board.opposite-view ~ .position-board-opponent-bench-1, game-board.opposite-view ~ .position-board-opponent-bench-2, game-board.opposite-view ~ .position-board-opponent-bench-3, game-board.opposite-view ~ .position-board-opponent-bench-4, game-board.opposite-view ~ .position-board-opponent-bench-5, game-board.opposite-view ~ .position-board-stadium {
+        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,0,0,1) rotate(180deg) translateY(var(--board-height));
+    }
+    
     .position-board-user-discard .card-position {
         width: var(--card-width);
-        left: 94.5%;
-        bottom: 19%;
+        left: calc(100% - var(--card-image-width) / 2 - var(--card-image-border));
+        bottom: 25%;
     }
     .position-board-user-active .card-position {
         width: var(--card-width);
         left: 50%;
-        bottom: 39%;
+        bottom: 37.5%;
     }
     .position-board-user-bench-1 .card-position {
         width: var(--card-width);
-        left: 24.3%;
-        bottom: 14%;
+        left: calc(50% - var(--card-image-width) * 2 - var(--card-image-border) * 4);
+        bottom: 12.5%;
     }
     .position-board-user-bench-2 .card-position {
         width: var(--card-width);
-        left: 38%;
-        bottom: 14%;
+        left: calc(50% - var(--card-image-width) - var(--card-image-border) * 2);
+        bottom: 12.5%;
     }
     .position-board-user-bench-3 .card-position {
         width: var(--card-width);
-        left: 51.7%;
-        bottom: 14%;
+        left: 50%;
+        bottom: 12.5%;
     }
     .position-board-user-bench-4 .card-position {
         width: var(--card-width);
-        left: 65.4%;
-        bottom: 14%;
+        left: calc(50% + var(--card-image-width) + var(--card-image-border) * 2);
+        bottom: 12.5%;
     }
     .position-board-user-bench-5 .card-position {
         width: var(--card-width);
-        left: 79.1%;
-        bottom: 14%;
+        left: calc(50% + var(--card-image-width) * 2 + var(--card-image-border) * 4);
+        bottom: 12.5%;
     }
     .position-board-opponent-discard .card-position {
         width: var(--card-width);
-        left: 5.5%;
-        bottom: 81%;
+        left: calc(var(--card-image-width) / 2 + var(--card-image-border));
+        bottom: 75%;
     }
     .position-board-opponent-active .card-position {
         width: var(--card-width);
         left: 50%;
-        bottom: 61%;
+        bottom: 62.5%;
     }
     .position-board-opponent-bench-1 .card-position {
         width: var(--card-width);
-        left: 75.3%;
-        bottom: 86%;
+        left: calc(50% + var(--card-image-width) * 2 + var(--card-image-border) * 4);
+        bottom: 87.5%;
     }
     .position-board-opponent-bench-2 .card-position {
         width: var(--card-width);
-        left: 61.6%;
-        bottom: 86%;
+        left: calc(50% + var(--card-image-width) + var(--card-image-border) * 2);
+        bottom: 87.5%;
     }
     .position-board-opponent-bench-3 .card-position {
         width: var(--card-width);
-        left: 47.9%;
-        bottom: 86%;
+        left: 50%;
+        bottom: 87.5%;
     }
     .position-board-opponent-bench-4 .card-position {
         width: var(--card-width);
-        left: 34.2%;
-        bottom: 86%;
+        left: calc(50% - var(--card-image-width) - var(--card-image-border) * 2);
+        bottom: 87.5%;
     }
     .position-board-opponent-bench-5 .card-position {
         width: var(--card-width);
-        left: 20.5%;
-        bottom: 86%;
+        left: calc(50% - var(--card-image-width) * 2 - var(--card-image-border) * 4);
+        bottom: 87.5%;
     }
     .position-board-stadium .card-position {
         width: var(--card-width);
-        left: 27.8%;
+        left: 25%;
         bottom: 50%;
     }
 
@@ -244,12 +297,22 @@
     }
     .stack .card-position {
         position: absolute;
-        left: var(--stack-left);
-        bottom: var(--stack-bottom);
+        left: calc(var(--cursor-x) - var(--board-translateX));
+        bottom: calc(100vh - var(--cursor-y) + var(--board-translateY));
         transition: all var(--animation-time), left var(--stack-time), bottom var(--stack-time);
+    }
+    game-board.opposite-view ~ .stack {
+        transform: translateX(var(--board-translateX)) translateY(var(--board-translateY)) rotate(180deg) translateY(var(--board-height));
+    }
+    game-board.opposite-view ~ .stack .card-position {
+        left: calc(100vw - var(--cursor-x) - var(--board-translateX));
+        bottom: calc(var(--cursor-y) + var(--board-translateX));
     }
     .stack .card-shadow {
         transform: rotate(0);
+    }
+    game-board.opposite-view ~ .stack .card-shadow {
+        transform: rotate(180deg);
     }
 
     .focused {
@@ -274,18 +337,31 @@
         background-image: var(--card-shadow-image);
         background-repeat: no-repeat;
         background-size: 100% 100%;
-        transition: all var(--animation-time), background calc(var(--animation-time) / 4) !important;
+        transition: all var(--animation-time), background calc(var(--animation-time) / 4), filter calc(var(--animation-time) / 2) !important;
+    }
+    .card-shadow:not(.selected):hover {
+        filter: brightness(1.125);
     }
     .selected .card-shadow {
         background-image: url('card-highlight.png') !important;
-        animation: selected-card 2s ease-in-out infinite;
+        animation: selected-card 2s infinite;
     }
     @keyframes selected-card {
         0% {
-            filter: brightness(1);
+            filter: brightness(1.125);
+            animation-timing-function: ease-out;
         }
-        50% {
+        25% {
             filter: brightness(1.25);
+            animation-timing-function: ease-in;
+        }
+        75% {
+            filter: brightness(1);
+            animation-timing-function: ease-in;
+        }
+        100% {
+            filter: brightness(1.125);
+            animation-timing-function: ease-out;
         }
     }
 
@@ -354,24 +430,26 @@
 
         css.setProperty('--board-width', `${boardWidth}px`)
         css.setProperty('--board-height', `${boardHeight}px`)
+        css.setProperty('--drop-zone-border-size', `${boardWidth * 0.125 * 29/734}px`)
         css.setProperty('--board-translateX', `${offsetX}px`)
         css.setProperty('--board-translateY', `${offsetY}px`)
         css.setProperty('--board-depth-transform', Math.min(0, (available2DHeight - boardHeight) / (available2DHeight * boardHeight)))
+
+        css.setProperty('--board-2d-height', `${available2DHeight}px`)
     }
     updateBoardTransform()
 
     window.addEventListener('resize', updateBoardTransform)
-    function setStackPos () {
-        css.setProperty('--stack-left', `calc(${cursorPos.x}px - var(--board-translateX))`)
-        css.setProperty('--stack-bottom', `calc(${(window.innerHeight - cursorPos.y)}px + var(--board-translateY))`)
-    }
-
-    let cursorUpdateStackPos = false
     let cursorPos
     window.addEventListener('contextmenu', (event) => {
         if (debugRightClickMenu == false) event.preventDefault()
     })
     window.addEventListener('dragstart', (event) => event.preventDefault())
+    let cursorUpdateStackPos = true
+    function setStackPos () {
+        css.setProperty('--cursor-x', `calc(${cursorPos.x}px)`)
+        css.setProperty('--cursor-y', `calc(${cursorPos.y}px)`)
+    }
     window.addEventListener('mousemove', (event) => {
         cursorPos = {'x': event.clientX, 'y': event.clientY}
         if (cursorUpdateStackPos == true) setStackPos()
@@ -402,7 +480,7 @@
 
     let stackAnimationTimeouts = []
     function clearCardStack () {
-        cursorUpdateStackPos = false
+        cursorUpdateStackPos = true
         stackAnimationTimeouts.forEach(timeout => clearTimeout(timeout));
         css.setProperty('--stack-lower-layer-display', 'unset')
         css.setProperty('--stack-time', getComputedStyle(document.body).getPropertyValue('--animation-time'))
@@ -448,6 +526,8 @@
             this.setAttribute('onmouseup', 'this.onMouseUp()')
             this.setAttribute('ontouchend', 'this.onMouseUp()')
             this.setAttribute('onmouseleave', 'this.onMouseLeave()')
+            this.setAttribute('dragleave', 'this.onMouseLeave()')
+
             this.setAttribute('ontouchmove', 'this.onTouchMove(event)')
             this.mouseDown = false
             this.removeSelected = false
@@ -545,9 +625,10 @@
                 document.querySelectorAll('.selected').forEach(elm => elm.classList.add('stack'))
                 const animationTimeSeconds = getComputedStyle(document.body).getPropertyValue('--animation-time').split('s')[0]
                 const steps = Math.round(animationTimeSeconds * 24)
+                cursorUpdateStackPos = false
                 for (let i = 0; i < steps+1; i++) {
                     stackAnimationTimeouts.push(
-                            setTimeout(() => {
+                        setTimeout(() => {
                             setStackPos()
                             css.setProperty('--stack-time', `${animationTimeSeconds * (1 - i / steps)}s`)
                             if (i == steps) {
