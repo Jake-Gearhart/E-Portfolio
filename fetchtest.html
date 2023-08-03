@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Fetch Data from URL</title>
+    </head>
+    <body>
+        <script>
+            // use fetch() to load the content from the URL
+            fetch('https://pastebin.com/raw/n45d0G1w')
+                .then(response => response.text())  // convert the response to text
+                .then(data => {
+                    // print the data to the console
+                    console.log(data);
+                })
+                .catch((error) => {
+                    // if there's an error, log it
+                    console.log("Error:", error);
+                });
+        </script>
+    </body>
+</html>
